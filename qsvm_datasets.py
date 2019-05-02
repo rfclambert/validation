@@ -34,20 +34,21 @@ def ad_hoc_data(training_size, test_size, n, gap, PLOT_DATA):
         N = 20   # courseness of data seperation
 
     label_train = np.zeros(2*(training_size+test_size))
-    sample_train = []
-    sampleA = [[0 for x in range(n)] for y in range(training_size+test_size)]
-    sampleB = [[0 for x in range(n)] for y in range(training_size+test_size)]
+    # sample_train = [] not used
+    sampleA = [[0 for _ in range(n)] for _ in range(training_size+test_size)]
+    sampleB = [[0 for _ in range(n)] for _ in range(training_size+test_size)]
 
     sample_Total = [[[0 for x in range(N)] for y in range(N)] for z in range(N)]
 
-    interactions = np.transpose(np.array([[1, 0], [0, 1], [1, 1]]))
+    # interactions = np.transpose(np.array([[1, 0], [0, 1], [1, 1]])) not used
 
     steps = 2*np.pi/N
+    # Not used
+    # sx = np.array([[0, 1], [1, 0]])
+    # X = np.asmatrix(sx)
+    # sy = np.array([[0, -1j], [1j, 0]])
+    # Y = np.asmatrix(sy)
 
-    sx = np.array([[0, 1], [1, 0]])
-    X = np.asmatrix(sx)
-    sy = np.array([[0, -1j], [1j, 0]])
-    Y = np.asmatrix(sy)
     sz = np.array([[1, 0], [0, -1]])
     Z = np.asmatrix(sz)
     J = np.array([[1, 0], [0, 1]])
@@ -55,13 +56,13 @@ def ad_hoc_data(training_size, test_size, n, gap, PLOT_DATA):
     H = np.array([[1, 1], [1, -1]])/np.sqrt(2)
     H2 = np.kron(H, H)
     H3 = np.kron(H, H2)
-    H = np.asmatrix(H)
+    # H = np.asmatrix(H) not used
     H2 = np.asmatrix(H2)
     H3 = np.asmatrix(H3)
 
     f = np.arange(2**n)
 
-    my_array = [[0 for x in range(n)] for y in range(2**n)]
+    my_array = [[0 for _ in range(n)] for _ in range(2**n)]
 
     for arindex in range(len(my_array)):
         temp_f = bin(f[arindex])[2:].zfill(n)
@@ -74,7 +75,7 @@ def ad_hoc_data(training_size, test_size, n, gap, PLOT_DATA):
     # Define decision functions
     maj = (-1)**(2*my_array.sum(axis=0) > n)
     parity = (-1)**(my_array.sum(axis=0))
-    dict1 = (-1)**(my_array[0])
+    # dict1 = (-1)**(my_array[0]) not used
     if n == 2:
         D = np.diag(parity)
     elif n == 3:
@@ -86,7 +87,7 @@ def ad_hoc_data(training_size, test_size, n, gap, PLOT_DATA):
     [S, U] = np.linalg.eig(Basis)
 
     idx = S.argsort()[::-1]
-    S = S[idx]
+    # S = S[idx]
     U = U[:, idx]
 
     M = (np.asmatrix(U)).getH()*np.asmatrix(D)*np.asmatrix(U)
@@ -107,7 +108,7 @@ def ad_hoc_data(training_size, test_size, n, gap, PLOT_DATA):
                 phi = x1*np.kron(Z, J) + x2*np.kron(J, Z) + (np.pi-x1)*(np.pi-x2)*np.kron(Z, Z)
                 Uu = scipy.linalg.expm(1j*phi)
                 psi = np.asmatrix(Uu)*H2*np.asmatrix(Uu)*np.transpose(psi_0)
-                temp = np.asscalar(np.real(psi.getH()*M*psi))
+                temp = np.real(psi.getH()*M*psi).item(0)  # asscalar depreciated
                 if temp > gap:
                     sample_Total[n1][n2] = +1
                 elif temp < -gap:
@@ -169,7 +170,7 @@ def ad_hoc_data(training_size, test_size, n, gap, PLOT_DATA):
                         (np.pi-x1)*(np.pi-x3)*np.kron(np.kron(Z, J), Z)
                     Uu = scipy.linalg.expm(1j*phi)
                     psi = np.asmatrix(Uu)*H3*np.asmatrix(Uu)*np.transpose(psi_0)
-                    temp = np.asscalar(np.real(psi.getH()*M*psi))
+                    temp = np.real(psi.getH()*M*psi).item(0)  # asscalar depreciated
                     if temp > gap:
                         sample_Total[n1][n2][n3] = +1
                         sample_total_A.append([n1, n2, n3])
@@ -264,8 +265,8 @@ def sample_ad_hoc_data(sample_Total, test_size, n):
         N = 20
 
     label_train = np.zeros(2*test_size)
-    sampleA = [[0 for x in range(n)] for y in range(test_size)]
-    sampleB = [[0 for x in range(n)] for y in range(test_size)]
+    sampleA = [[0 for _ in range(n)] for _ in range(test_size)]
+    sampleB = [[0 for _ in range(n)] for _ in range(test_size)]
     while tr < (test_size):
         draw1 = np.random.choice(N)
         draw2 = np.random.choice(N)
@@ -291,149 +292,68 @@ def sample_ad_hoc_data(sample_Total, test_size, n):
     return test_input
 
 
+def general_transformation(data, target, class_labels, plot_name, training_size, test_size, n, PLOT_DATA):
+    sample, _, label, _ = train_test_split(data, target, train_size=0.99, test_size=0.01, random_state=12)
+
+    # Now we standarize for gaussian around 0 with unit variance
+    std_scale = StandardScaler().fit(sample)
+    sample = std_scale.transform(sample)
+
+    # Now reduce number of features to number of qubits
+    pca = PCA(n_components=n).fit(sample)
+    sample = pca.transform(sample)
+
+    # Scale to the range (-1,+1)
+    # samples = np.append(sample, sample_test, axis=0)
+    minmax_scale = MinMaxScaler((-1, 1)).fit(sample)
+    sample = minmax_scale.transform(sample)
+
+    # Check for overflow
+    for k in range(len(class_labels)):
+        if len(sample[label == k, :]) < training_size + test_size:
+            raise ValueError("Not enough data for specified training and testing sizes")
+
+    # Pick training size number of samples from each distro
+    training_input = {key: (sample[label == k, :])[:training_size] for k, key in enumerate(class_labels)}
+    test_input = {key: (sample[label == k, :])[training_size:(
+            training_size + test_size)] for k, key in enumerate(class_labels)}
+
+    if PLOT_DATA:
+        for k in range(len(class_labels)):
+            plt.scatter(sample[label == k, 0][:training_size],
+                        sample[label == k, 1][:training_size])
+
+        plt.title(plot_name)
+        plt.show()
+    return sample, training_input, test_input, class_labels
+
+
 def Breast_cancer(training_size, test_size, n, PLOT_DATA):
     class_labels = [r'A', r'B']
     data, target = datasets.load_breast_cancer(True)
-    sample_train, sample_test, label_train, label_test = train_test_split(data, target, test_size=0.3, random_state=12)
-
-    # Now we standarize for gaussian around 0 with unit variance
-    std_scale = StandardScaler().fit(sample_train)
-    sample_train = std_scale.transform(sample_train)
-    sample_test = std_scale.transform(sample_test)
-
-    # Now reduce number of features to number of qubits
-    pca = PCA(n_components=n).fit(sample_train)
-    sample_train = pca.transform(sample_train)
-    sample_test = pca.transform(sample_test)
-
-    # Scale to the range (-1,+1)
-    samples = np.append(sample_train, sample_test, axis=0)
-    minmax_scale = MinMaxScaler((-1, 1)).fit(samples)
-    sample_train = minmax_scale.transform(sample_train)
-    sample_test = minmax_scale.transform(sample_test)
-
-    # Pick training size number of samples from each distro
-    training_input = {key: (sample_train[label_train == k, :])[:training_size] for k, key in enumerate(class_labels)}
-    test_input = {key: (sample_train[label_train == k, :])[training_size:(
-        training_size+test_size)] for k, key in enumerate(class_labels)}
-
-    if PLOT_DATA:
-        for k in range(0, 2):
-            plt.scatter(sample_train[label_train == k, 0][:training_size],
-                        sample_train[label_train == k, 1][:training_size])
-
-        plt.title("PCA dim. reduced Breast cancer dataset")
-        plt.show()
-
-    return sample_train, training_input, test_input, class_labels
+    plot_name = "PCA dim. reduced Breast cancer dataset"
+    return general_transformation(data, target, class_labels, plot_name, training_size, test_size, n, PLOT_DATA)
 
 
 def Digits(training_size, test_size, n, PLOT_DATA):
     class_labels = [r'A', r'B', r'C', r'D', r'E', r'F', r'G', r'H', r'I', r'J']
     data = datasets.load_digits()
-    sample_train, sample_test, label_train, label_test = train_test_split(
-        data.data, data.target, test_size=0.3, random_state=22)
-
-    # Now we standarize for gaussian around 0 with unit variance
-    std_scale = StandardScaler().fit(sample_train)
-    sample_train = std_scale.transform(sample_train)
-    sample_test = std_scale.transform(sample_test)
-
-    # Now reduce number of features to number of qubits
-    pca = PCA(n_components=n).fit(sample_train)
-    sample_train = pca.transform(sample_train)
-    sample_test = pca.transform(sample_test)
-
-    # Scale to the range (-1,+1)
-    samples = np.append(sample_train, sample_test, axis=0)
-    minmax_scale = MinMaxScaler((-1, 1)).fit(samples)
-    sample_train = minmax_scale.transform(sample_train)
-    sample_test = minmax_scale.transform(sample_test)
-
-    # Pick training size number of samples from each distro
-    training_input = {key: (sample_train[label_train == k, :])[:training_size] for k, key in enumerate(class_labels)}
-    test_input = {key: (sample_train[label_train == k, :])[training_size:(
-        training_size+test_size)] for k, key in enumerate(class_labels)}
-
-    if PLOT_DATA:
-        for k in range(0, 9):
-            plt.scatter(sample_train[label_train == k, 0][:training_size],
-                        sample_train[label_train == k, 1][:training_size])
-
-        plt.title("PCA dim. reduced Digits dataset")
-        plt.show()
-
-    return sample_train, training_input, test_input, class_labels
+    plot_name = "PCA dim. reduced Digits dataset"
+    return general_transformation(data.data, data.target, class_labels, plot_name, training_size, test_size, n, PLOT_DATA)
 
 
 def Iris(training_size, test_size, n, PLOT_DATA):
     class_labels = [r'A', r'B', r'C']
     data, target = datasets.load_iris(True)
-    sample_train, sample_test, label_train, label_test = train_test_split(data, target, test_size=1, random_state=42)
-
-    # Now we standarize for gaussian around 0 with unit variance
-    std_scale = StandardScaler().fit(sample_train)
-    sample_train = std_scale.transform(sample_train)
-    sample_test = std_scale.transform(sample_test)
-
-    # Scale to the range (-1,+1)
-    samples = np.append(sample_train, sample_test, axis=0)
-    minmax_scale = MinMaxScaler((-1, 1)).fit(samples)
-    sample_train = minmax_scale.transform(sample_train)
-    sample_test = minmax_scale.transform(sample_test)
-
-    # Pick training size number of samples from each distro
-    training_input = {key: (sample_train[label_train == k, :])[:training_size] for k, key in enumerate(class_labels)}
-    test_input = {key: (sample_train[label_train == k, :])[training_size:(
-        training_size+test_size)] for k, key in enumerate(class_labels)}
-
-    if PLOT_DATA:
-        for k in range(0, 3):
-            plt.scatter(sample_train[label_train == k, 0][:training_size],
-                        sample_train[label_train == k, 1][:training_size])
-
-        plt.title("Iris dataset")
-        plt.show()
-
-    return sample_train, training_input, test_input, class_labels
+    plot_name = "Iris dataset"
+    return general_transformation(data, target, class_labels, plot_name, training_size, test_size, n, PLOT_DATA)
 
 
 def Wine(training_size, test_size, n, PLOT_DATA):
     class_labels = [r'A', r'B', r'C']
-
     data, target = datasets.load_wine(True)
-    sample_train, sample_test, label_train, label_test = train_test_split(data, target, test_size=0.1,
-                                                                          random_state=7)
-
-    # Now we standarize for gaussian around 0 with unit variance
-    std_scale = StandardScaler().fit(sample_train)
-    sample_train = std_scale.transform(sample_train)
-    sample_test = std_scale.transform(sample_test)
-
-    # Now reduce number of features to number of qubits
-    pca = PCA(n_components=n).fit(sample_train)
-    sample_train = pca.transform(sample_train)
-    sample_test = pca.transform(sample_test)
-
-    # Scale to the range (-1,+1)
-    samples = np.append(sample_train, sample_test, axis=0)
-    minmax_scale = MinMaxScaler((-1, 1)).fit(samples)
-    sample_train = minmax_scale.transform(sample_train)
-    sample_test = minmax_scale.transform(sample_test)
-    # Pick training size number of samples from each distro
-    training_input = {key: (sample_train[label_train == k, :])[:training_size] for k, key in enumerate(class_labels)}
-    test_input = {key: (sample_train[label_train == k, :])[training_size:(
-        training_size+test_size)] for k, key in enumerate(class_labels)}
-
-    if PLOT_DATA:
-        for k in range(0, 3):
-            plt.scatter(sample_train[label_train == k, 0][:training_size],
-                        sample_train[label_train == k, 1][:training_size])
-
-        plt.title("PCA dim. reduced Wine dataset")
-        plt.show()
-
-    return sample_train, training_input, test_input, class_labels
+    plot_name = "PCA dim. reduced Wine dataset"
+    return general_transformation(data, target, class_labels, plot_name, training_size, test_size, n, PLOT_DATA)
 
 
 def Gaussian(training_size, test_size, n, PLOT_DATA):
@@ -441,7 +361,7 @@ def Gaussian(training_size, test_size, n, PLOT_DATA):
     if n == 2:
         class_labels = [r'A', r'B']
         label_train = np.zeros(2*(training_size+test_size))
-        sample_train = []
+        # sample_train = [] not used
         sampleA = [[0 for x in range(n)] for y in range(training_size+test_size)]
         sampleB = [[0 for x in range(n)] for y in range(training_size+test_size)]
         randomized_vector1 = np.random.randint(2, size=n)
@@ -487,7 +407,7 @@ def Gaussian(training_size, test_size, n, PLOT_DATA):
     elif n == 3:
         class_labels = [r'A', r'B', r'C']
         label_train = np.zeros(3*(training_size+test_size))
-        sample_train = []
+        # sample_train = [] not used
         sampleA = [[0 for x in range(n)] for y in range(training_size+test_size)]
         sampleB = [[0 for x in range(n)] for y in range(training_size+test_size)]
         sampleC = [[0 for x in range(n)] for y in range(training_size+test_size)]

@@ -3,21 +3,17 @@ This module contains the definition of a base class for
 feature map. Several types of commonly used approaches.
 """
 
-
-import logging
-
 import numpy as np
-from qiskit import QuantumCircuit, QuantumRegister
-
-from qiskit_aqua.components.feature_maps import FeatureMap
 from inspect import signature
-
+import logging
 logger = logging.getLogger(__name__)
 
+from qiskit import QuantumCircuit, QuantumRegister
+from qiskit.aqua.components.feature_maps import FeatureMap
 
 class CustomExpansion(FeatureMap):
     """
-    Mapping data the way you want
+    Mapping data using a custom feature map.
     """
 
     CONFIGURATION = {
@@ -27,16 +23,12 @@ class CustomExpansion(FeatureMap):
             '$schema': 'http://json-schema.org/schema#',
             'id': 'Custom_Expansion_schema',
             'type': 'object',
-            'properties': {
-                'feature_param': {
-                    'type': ['array']
-                }
-            },
+            'properties': {'feature_param': {'type': ['array']}},
             'additionalProperties': False
         }
     }
 
-    def __init__(self, num_qubits, constructor_function, feature_param):
+    def __init__(self, feature_dimension, constructor_function, feature_param):
         """Constructor.
 
         Args:
@@ -50,7 +42,7 @@ class CustomExpansion(FeatureMap):
         """
         self.validate(locals())
         super().__init__()
-        self._num_qubits = num_qubits
+        self._num_qubits = self._feature_dimension = feature_dimension
         sig = signature(constructor_function)
         if len(sig.parameters) != len(feature_param)+3:
             raise ValueError("The constructor_function given don't match the parameters given.\n" +
@@ -58,7 +50,7 @@ class CustomExpansion(FeatureMap):
                              " inverse and all the parameters provided in feature_param")
         self._constructor_function = constructor_function
         self._feature_param = feature_param
-
+    
     def construct_circuit(self, x, qr=None, inverse=False):
         """
         Construct the circuit based on given data and according to the function provided at instantiation.
@@ -67,10 +59,10 @@ class CustomExpansion(FeatureMap):
             x (numpy.ndarray): 1-D to-be-transformed data.
             qr (QauntumRegister): the QuantumRegister object for the circuit, if None,
                                   generate new registers with name q.
-            inverse (bool): whether or not inverse the circuit
+            inverse (bool): whether or not to invert the circuit
 
         Returns:
-            QuantumCircuit: a quantum circuit transform data x.
+            qc (QuantumCircuit): a quantum circuit to transform data x.
         """
         if not isinstance(x, np.ndarray):
             raise TypeError("x must be numpy array.")

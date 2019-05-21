@@ -9,7 +9,7 @@ import logging
 import numpy as np
 from qiskit import QuantumCircuit, QuantumRegister
 
-from qiskit_aqua.components.feature_maps import FeatureMap
+from qiskit.aqua.components.feature_maps import FeatureMap
 from inspect import signature
 
 logger = logging.getLogger(__name__)
@@ -51,6 +51,7 @@ class CustomExpansion(FeatureMap):
         self.validate(locals())
         super().__init__()
         self._num_qubits = num_qubits
+        self._feature_dimension = num_qubits
         sig = signature(constructor_function)
         if len(sig.parameters) != len(feature_param)+3:
             raise ValueError("The constructor_function given don't match the parameters given.\n" +

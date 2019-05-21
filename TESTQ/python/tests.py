@@ -3,6 +3,7 @@ from svm import *
 from utils import get_data
 import matplotlib.pyplot as plt
 import functools
+from custom_map import CustomExpansion
 from sklearn import svm
 from qiskit.aqua import run_algorithm, QuantumInstance
 from qiskit.aqua.components.feature_maps import SecondOrderExpansion, FirstOrderExpansion, PauliExpansion, self_product
@@ -10,6 +11,7 @@ from qiskit.aqua.algorithms import QSVM
 from qiskit.aqua.algorithms.many_sample.qsvm._qsvm_estimator import _QSVM_Estimator
 from qiskit.aqua.components.multiclass_extensions.all_pairs import *
 from qsvm_datasets import *
+from wavelets import Wavelets
 
 def ccxtest(n):
     """Truth table for cnx"""
@@ -448,6 +450,25 @@ def my_impl(in_train, in_test, labels):
     kernel_estimation(X_train, Y_train, X_test, Y_test)
 
 
+def custom_constr(x, qr, inverse, depth):
+    qc = QuantumCircuit(qr)
+    maxi, mini = max(x), min(x)
+    n = x.shape[0]
+    qc_wv = Wavelets(n).construct_circuit(register=qr)
+    for _ in range(depth):
+        qc.h(qr)
+        for i in range(n):
+            qc.u1(2*np.pi*(x[i]-mini)/(maxi-mini), qr[i])
+        for i in range(n):
+            qc.cx(qr[i], qr[(i + 1) % n])
+            qc.u1((2*np.pi)**2*(x[i]-mini)*(x[(i+1) % n]-mini)/(maxi-mini)**2, qr[(i + 1) % n])
+            qc.cx(qr[i], qr[(i + 1) % n])
+        qc = qc + qc_wv
+    if inverse:
+        return qc.inverse()
+    return qc
+
+
 def test_from_func(pres, nbr_by_label, nbr_by_label_test, nbr_comp, plot_graph, function, quantum_instance):
     print(pres)
     _, samp_train, samp_test, labels = function(nbr_by_label, nbr_by_label_test, nbr_comp, plot_graph)
@@ -488,6 +509,18 @@ def test_from_func(pres, nbr_by_label, nbr_by_label_test, nbr_comp, plot_graph, 
     if len(labels) == 2:
         print("Success for my implementation (second order):")
         my_impl(samp_train, samp_test, labels)
+
+    feature_map = CustomExpansion(num_qubits=nbr_comp, constructor_function=custom_constr, feature_param=[1])
+
+    if len(labels) > 2:
+        qsvm = QSVM(feature_map=feature_map, training_dataset=samp_train,
+                    test_dataset=samp_test, multiclass_extension=AllPairs(_QSVM_Estimator, [feature_map]))
+    else:
+        qsvm = QSVM(feature_map=feature_map, training_dataset=samp_train,
+                    test_dataset=samp_test)
+    result = qsvm.run(quantum_instance)
+    print("Success of the Custom feature map kernel:")
+    print(result['testing_accuracy'])
 
     return 0
 
@@ -553,7 +586,7 @@ def test_svm():
 
     # small adn strings
     print("Test pour des séquences ADN courtes (difficile, classique)")
-    #test_from_func(pres, 15, 10, 14, True, Sequence, quantum_instance)
+    test_from_func(pres, 15, 10, 14, True, Sequence, quantum_instance)
 
 
 def test_svm_quantique():
@@ -610,8 +643,8 @@ def test_svm_quantique():
     my_impl(samp_train_me, samp_test_me, labels_me)
 
 
-test_svm_quantique()
-# test_svm()
+# test_svm_quantique()
+test_svm()
 # test_compar(1.9)
 # test_stat()
 # test_24()

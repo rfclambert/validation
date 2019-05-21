@@ -16,16 +16,16 @@
 # =============================================================================
 
 from qiskit import QuantumRegister, QuantumCircuit
-from qiskit.aqua.components.iqfts import IQFT
+from qiskit.aqua.components.qfts import QFT
 from wavelets_utils import *
 
 
-class Wavelets(IQFT):
+class IWavelets(QFT):
     """A Wavelet Transform."""
 
     CONFIGURATION = {
-        'name': 'WAVELETS',
-        'description': 'QWT',
+        'name': 'IWAVELETS',
+        'description': 'Inverse QWT',
         'input_schema': {
             '$schema': 'http://json-schema.org/schema#',
             'id': 'std_iqft_schema',
@@ -41,7 +41,7 @@ class Wavelets(IQFT):
         self._num_qubits = num_qubits
 
     def _build_matrix(self):
-        return wave_coefs(2**self._num_qubits)
+        return wave_coefs(2**self._num_qubits).transpose()
 
     def _build_circuit(self, qubits=None, circuit=None, do_swaps=True):
         return self.construct_circuit('circuit', qubits, circuit, True)
@@ -57,6 +57,6 @@ class Wavelets(IQFT):
                 CZeroP(circuit, register, register[0])
                 Qn(circuit, register, [register[i] for i in range(self._num_qubits)])
                 COne(circuit, register, register[0])
-            return circuit
+            return circuit.inverse()
         else:
             raise ValueError('Mode should be either "vector" or "circuit"')

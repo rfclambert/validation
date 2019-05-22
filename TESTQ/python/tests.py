@@ -458,12 +458,14 @@ def custom_constr(x, qr, inverse, depth):
     for _ in range(depth):
         qc.h(qr)
         for i in range(n):
-            qc.u1(2*np.pi*(x[i]-mini)/(maxi-mini), qr[i])
+            qc.u2(np.pi*(x[(i+1) % n]-mini)/(maxi-mini), 2*np.pi*(x[i]-mini)/(maxi-mini), qr[i])
         for i in range(n):
             qc.cx(qr[i], qr[(i + 1) % n])
-            qc.u1((2*np.pi)**2*(x[i]-mini)*(x[(i+1) % n]-mini)/(maxi-mini)**2, qr[(i + 1) % n])
+            qc.u2(np.pi*(x[(i+1) % n]-mini)/(maxi-mini),
+                  ((2*np.pi)**2*(x[i]-mini)*(x[(i+1) % n]-mini)/(maxi-mini)**2) % 2*np.pi,
+                  qr[(i + 1) % n])
             qc.cx(qr[i], qr[(i + 1) % n])
-        qc = qc + qc_wv
+        #qc = qc + qc_wv
     if inverse:
         return qc.inverse()
     return qc
@@ -570,7 +572,7 @@ def test_svm():
 
     # breast cancer
     pres = "Test pour le data set Breast Cancer (facile, classique)"
-    #test_from_func(pres, 15, 10, 3, True, Breast_cancer, quantum_instance)
+    test_from_func(pres, 15, 10, 3, True, Breast_cancer, quantum_instance)
 
     # digits
     # pres = "Test pour le data set Digits (difficile, classique)"
@@ -585,7 +587,7 @@ def test_svm():
     test_from_func(pres, 15, 10, 2, True, Gaussian, quantum_instance)
 
     # small adn strings
-    print("Test pour des séquences ADN courtes (difficile, classique)")
+    pres = "Test pour des séquences ADN courtes (difficile, classique)"
     test_from_func(pres, 15, 10, 14, True, Sequence, quantum_instance)
 
 
@@ -642,8 +644,21 @@ def test_svm_quantique():
     my_impl(samp_train, samp_test, labels)
     my_impl(samp_train_me, samp_test_me, labels_me)
 
+    feature_map = CustomExpansion(num_qubits=2, constructor_function=custom_constr, feature_param=[1])
 
-# test_svm_quantique()
+    qsvm = QSVM(feature_map=feature_map, training_dataset=samp_train,
+                test_dataset=samp_test)
+    qsvm_me = QSVM(feature_map=feature_map, training_dataset=samp_train_me,
+                   test_dataset=samp_test_me)
+
+    result = qsvm.run(quantum_instance)
+    result_me = qsvm_me.run(quantum_instance)
+    print("Success of the Custom feature map kernel:")
+    print(result['testing_accuracy'])
+    print(result_me['testing_accuracy'])
+
+
+test_svm_quantique()
 test_svm()
 # test_compar(1.9)
 # test_stat()

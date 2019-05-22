@@ -2,3 +2,5 @@
 *.csv
 venv*
 *.pyc
+*__pycache__*
+TESTQ/src/__pycache__/custom_map.cpython-37.pyc

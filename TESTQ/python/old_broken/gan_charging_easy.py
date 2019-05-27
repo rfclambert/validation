@@ -2,7 +2,7 @@ from General import *
 from sklearn.neural_network import MLPClassifier
 import matplotlib.pyplot as plt
 
-from qiskit_aqua.components.optimizers import SPSA
+from qiskit.aqua.components.optimizers import SPSA
 
 
 def sum_l(L):

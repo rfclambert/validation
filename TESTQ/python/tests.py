@@ -1,12 +1,10 @@
 from General import *
 from svm import *
-from utils import get_data
-import matplotlib.pyplot as plt
-import functools
+from gan_charging_back import *
 from custom_map import CustomExpansion
 from sklearn import svm
-from qiskit.aqua import run_algorithm, QuantumInstance
-from qiskit.aqua.components.feature_maps import SecondOrderExpansion, FirstOrderExpansion, PauliExpansion, self_product
+from qiskit.aqua import QuantumInstance
+from qiskit.aqua.components.feature_maps import SecondOrderExpansion, FirstOrderExpansion
 from qiskit.aqua.algorithms import QSVM
 from qiskit.aqua.algorithms.many_sample.qsvm._qsvm_estimator import _QSVM_Estimator
 from qiskit.aqua.components.multiclass_extensions.all_pairs import *
@@ -566,11 +564,11 @@ def test_svm():
     quantum_instance = QuantumInstance(backend, seed=random_seed, seed_transpiler=random_seed)
 
     # iris
-    pres = "Test pour le data set Iris (facile, classique)"
+    # pres = "Test pour le data set Iris (facile, classique)"
     #test_from_func(pres, 15, 10, 3, True, Iris, quantum_instance)
 
     # breast cancer
-    pres = "Test pour le data set Breast Cancer (facile, classique)"
+    # pres = "Test pour le data set Breast Cancer (facile, classique)"
     #test_from_func(pres, 15, 10, 3, True, Breast_cancer, quantum_instance)
 
     # digits
@@ -578,7 +576,7 @@ def test_svm():
     # test_from_func(pres, 10, 10, 10, True, Digits, quantum_instance)
 
     # wine
-    pres = "Test pour le data set Wine (moyen, classique)"
+    # pres = "Test pour le data set Wine (moyen, classique)"
     #test_from_func(pres, 15, 10, 5, True, Wine, quantum_instance)
 
     # gaussian
@@ -589,9 +587,8 @@ def test_svm():
         test_from_func(pres, 15, 10, 2, False, Gaussian, quantum_instance)
         print("\n")
 
-
     # small adn strings
-    pres = "Test pour des séquences ADN courtes (difficile, classique)"
+    # pres = "Test pour des séquences ADN courtes (difficile, classique)"
     #test_from_func(pres, 10, 15, 14, True, Sequence, quantum_instance)
 
 
@@ -621,7 +618,7 @@ def test_svm_quantique():
     qsvm = QSVM(feature_map=feature_map, training_dataset=samp_train,
                 test_dataset=samp_test)
     qsvm_me = QSVM(feature_map=feature_map, training_dataset=samp_train_me,
-                test_dataset=samp_test_me)
+                   test_dataset=samp_test_me)
 
     result = qsvm.run(quantum_instance)
     result_me = qsvm_me.run(quantum_instance)
@@ -636,7 +633,7 @@ def test_svm_quantique():
     qsvm = QSVM(feature_map=feature_map, training_dataset=samp_train,
                 test_dataset=samp_test)
     qsvm_me = QSVM(feature_map=feature_map, training_dataset=samp_train_me,
-                test_dataset=samp_test_me)
+                   test_dataset=samp_test_me)
 
     result = qsvm.run(quantum_instance)
     result_me = qsvm_me.run(quantum_instance)
@@ -662,11 +659,44 @@ def test_svm_quantique():
     print(result_me['testing_accuracy'])
 
 
-#test_svm_quantique()
+def general_gantest(proba, nbr_qubits):
+    for m in [4096, 2048]:
+        for l in [1, 2, 3]:
+            print("Easy mode results for m={} and l={}:".format(m, l))
+            Variationer_learn_gan(1000, l, m, proba=proba, n=nbr_qubits, distri_size=0, easy=True)
+            print("\n")
+            print("Distribution learning results for m={} and l={}:".format(m, l))
+            for d in [256, 512]:
+                print("For ", d, ": ")
+                Variationer_learn_gan(1000, l, m, proba=proba, n=nbr_qubits, distri_size=d, easy=False)
+            print("Singleton learning results for m={} and l={}:".format(m, l))
+            Variationer_learn_gan(1000, l, m, proba=proba, n=nbr_qubits, distri_size=0, easy=False)
+
+
+def test_gan():
+    # Variationer_learn_gan(1000, 1, 4096, proba=[1 / 24] * 24 + 8 * [0], n=5, distri_size=0, easy=True)
+    nbr_qubits = 5
+
+    # beta
+    arr_beta = beta_proba(nbr_qubits)
+    general_gantest(arr_beta, nbr_qubits)
+
+    # uniform not on [0, 32]
+    if nbr_qubits == 5:
+        arr_unif = [1 / 24] * 24 + 8 * [0]
+        general_gantest(arr_unif, nbr_qubits)
+
+    # Normal 0, 1
+    arr_norm = None
+    general_gantest(arr_norm, nbr_qubits)
+
+
+# test_svm_quantique()
 # test_svm()
 # test_compar(1.9)
 # test_stat()
 # test_24()
-test_arith()
+# test_arith()
 # test_QFTn(3)
 # test_draw()
+test_gan()

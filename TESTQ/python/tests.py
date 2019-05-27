@@ -166,7 +166,7 @@ def addition_mod(a,b,nbr):
     bina = [int(x) for x in bin(a)[2:]]
     binb = [int(x) for x in bin(b)[2:]]
     binn = [int(x) for x in bin(nbr)[2:]]
-    print(binn)
+    #print(binn)
     while len(bina)>=len(binb):
         binb = [0]+binb
     while len(bina)<len(binb)-1:
@@ -179,7 +179,7 @@ def addition_mod(a,b,nbr):
     binn.reverse()
     bina.reverse()
     binb.reverse()
-    print(bina, binb, binn)
+    #print(bina, binb, binn)
     n = len(bina)+len(binb)+len(binn)
     na = len(bina)
     nab = len(bina)+len(binb)
@@ -313,14 +313,14 @@ def tests_truth():
 
 
 def test_arith():
-    n_max = 15
+    n_max = 17
     a = r.randrange(2**(n_max//2))
     b = r.randrange(2**(n_max//2))
     circ_m = addition(a, b)
     print(circ_m.depth(), circ_m.width())
     #print(circ_m)
     print("{}+{} = ".format(a,b))
-    print(launch(1, circ_m))
+    lect_bin(launch(1, circ_m))
 
     a = r.randrange(2**(n_max//2))
     b = r.randrange(2**(n_max//2))
@@ -328,7 +328,7 @@ def test_arith():
     print(circ_m.depth(), circ_m.width())
     #print(circ_m)
     print("{}+{} = ".format(a, b))
-    print(launch(1, circ_m))
+    lect_bin(launch(1, circ_m))
 
     a = r.randrange(2**(n_max//2))
     b = r.randrange(2**(n_max//2))
@@ -336,7 +336,7 @@ def test_arith():
     print(circ_m.depth(), circ_m.width())
     # print(circ_m)
     print("{}-{} = ".format(a, b))
-    print(launch(1, circ_m))
+    lect_bin(launch(1, circ_m))
 
     n_max -= 1
     nbr = r.randrange(1, 2**(n_max//3))
@@ -346,7 +346,7 @@ def test_arith():
     print(circ_m.depth(), circ_m.width())
     # print(circ_m)
     print("{}+{}%{} = ".format(a, b, nbr))
-    print(launch(1, circ_m))
+    lect_bin(launch(1, circ_m))
 
     n_max -= 1
     print("Nmax", n_max)
@@ -357,7 +357,7 @@ def test_arith():
     print(circ_m.depth(), circ_m.width())
     # print(circ_m)
     print("{}*{}%{} = ".format(a, b, nbr))
-    print(launch(1, circ_m))
+    lect_bin(launch(1, circ_m))
 
     nbr = r.randrange(1, 2**(n_max//4))
     a = r.randrange(1, 2**(n_max//4))
@@ -366,7 +366,7 @@ def test_arith():
     print(circ_m.depth(), circ_m.width())
     # print(circ_m)
     print("{}**{}%{} = ".format(b, a, nbr))
-    print(launch(1, circ_m))
+    lect_bin(launch(1, circ_m))
 
 
 def test_draw():
@@ -559,7 +559,6 @@ def Sequence(nbr_by_label, nbr_by_label_test, nbr_comp, plot_graph):
     return [X_n, X_m], training_input, test_input, ["N", "M"]
 
 
-
 def test_svm():
     backend = BasicAer.get_backend('statevector_simulator')
     random_seed = 10598
@@ -568,11 +567,11 @@ def test_svm():
 
     # iris
     pres = "Test pour le data set Iris (facile, classique)"
-    test_from_func(pres, 15, 10, 3, True, Iris, quantum_instance)
+    #test_from_func(pres, 15, 10, 3, True, Iris, quantum_instance)
 
     # breast cancer
     pres = "Test pour le data set Breast Cancer (facile, classique)"
-    test_from_func(pres, 15, 10, 3, True, Breast_cancer, quantum_instance)
+    #test_from_func(pres, 15, 10, 3, True, Breast_cancer, quantum_instance)
 
     # digits
     # pres = "Test pour le data set Digits (difficile, classique)"
@@ -580,15 +579,20 @@ def test_svm():
 
     # wine
     pres = "Test pour le data set Wine (moyen, classique)"
-    test_from_func(pres, 15, 10, 5, True, Wine, quantum_instance)
+    #test_from_func(pres, 15, 10, 5, True, Wine, quantum_instance)
 
     # gaussian
     pres = "Test pour des données gaussiennes (moyen, classique)"
-    test_from_func(pres, 15, 10, 2, True, Gaussian, quantum_instance)
+    for _ in range(5):
+        print("\n")
+        print("New iteration")
+        test_from_func(pres, 15, 10, 2, False, Gaussian, quantum_instance)
+        print("\n")
+
 
     # small adn strings
     pres = "Test pour des séquences ADN courtes (difficile, classique)"
-    test_from_func(pres, 15, 10, 14, True, Sequence, quantum_instance)
+    #test_from_func(pres, 10, 15, 14, True, Sequence, quantum_instance)
 
 
 def test_svm_quantique():
@@ -658,11 +662,11 @@ def test_svm_quantique():
     print(result_me['testing_accuracy'])
 
 
-test_svm_quantique()
-test_svm()
+#test_svm_quantique()
+# test_svm()
 # test_compar(1.9)
 # test_stat()
 # test_24()
-# test_arith()
+test_arith()
 # test_QFTn(3)
 # test_draw()

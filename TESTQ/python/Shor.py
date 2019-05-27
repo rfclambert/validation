@@ -94,7 +94,7 @@ def periodfinder(A, n):
 
 def qperiodfinder(A, n):
     """The quantum algorithm to find the period in the modular exponentiation"""
-    maxQ = 25  # Here we set the number of qbits we have available
+    maxQ = 29  # Here we set the number of qbits we have available
     circ_m = shor_quant(A, n, maxQ)  # The quantum circuit is generated
     if circ_m is 0:
         print("Quantum circuit generation failed. Classical circuit engaged")
@@ -105,7 +105,7 @@ def qperiodfinder(A, n):
     name = 'ibmq_qasm_simulator'
     backend_sim = IBMQ.get_backend(name, hub=None)  # BasicAer.get_backend('qasm_simulator')
     print("Sending quantum circuit to hardware "+name+", waiting for the result...")
-    job_sim = execute(circ_m, backend_sim, shots=1, max_credits=3)
+    job_sim = execute(circ_m, backend_sim, shots=1, max_credits=3, optimization_level=1)
     result_sim = job_sim.result()
     print("Result get!")
     counts = result_sim.get_counts(circ_m)
@@ -129,7 +129,7 @@ def shor(n):
     """The global algorithm to find the factorization of n into its prime components."""
     print("Starting...")
     # A random integer is picked
-    A = 7#r.randrange(2, n)
+    A = 13#r.randrange(2, n) # 7 for 15, 13 for 21
     print("A:", A)
     # If we're lucky it's already the prime number or a multiple of it
     res = np.gcd(A, n)
@@ -154,4 +154,4 @@ def shor(n):
         return P, n // P
 
 
-print(shor(15))
+print(shor(21))

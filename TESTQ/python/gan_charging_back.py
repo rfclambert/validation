@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 from qiskit.aqua.components.optimizers import SPSA
 from scipy.stats import beta
 
+
 def sum_l(L):
     res = []
     for l in L:
@@ -329,6 +330,12 @@ t_5_1024_alt = [ -5.47090021,  14.1117991 ,   3.84301668,  11.0155575 ,
         -2.75836741,  15.03734549, -13.77320335,   2.35618223,
         19.65803084,  -0.48621641,   7.68344555,   0.39935987]
 
+#pour les cartes
+t_1_4096_cartes = np.array([13.86993424,  5.04909209, -1.79695972, -0.84285724,  1.08545796,
+        2.97134661,  6.46717987,  3.13638555,  5.088643  , -5.46823185,
+       -1.68518226,  4.67255675, -1.73082473,  0.69172197, -2.14461026,
+       -1.4988397 ,  1.46973947, -4.73567944, -1.89753097,  1.24460023])
+
 theta_inpu = t_5_1024_alt
 
 a, b = 5, 1
@@ -338,5 +345,5 @@ print(sum(beta.pdf(arr, a, b)*1/32))
 plt.plot(arr, beta.pdf(arr, a, b))
 plt.show()
 #Variational_prepared(theta_inpu, 4)
-print(Variationer_learn(10, 2, 64, proba=[1/24]*24+8*[0], n=5, distri_size=0, easy=False))
+print(Variationer_learn(1000, 1, 4096, proba=[1/24]*24+8*[0], n=5, distri_size=0, easy=True))
 

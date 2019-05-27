@@ -318,7 +318,7 @@ def kern(X, Y):
         if sym:
             for j in range(i, n_y):
                 # To keep track of the time
-                if (i*n_y+j) % 10 == 0:
+                if (i*n_y+j) % 100 == 0:
                     print("Iteration {}/{}".format((i*n_y+j), n*n_y))
                 # We build and run the circuit
                 circ_x = QuantumCircuit(q)
@@ -333,7 +333,7 @@ def kern(X, Y):
         else:
             for j in range(n_y):
                 # To keep track of the time
-                if (i*n_y+j) % 10 == 0:
+                if (i*n_y+j) % 100 == 0:
                     print("Iteration {}/{}".format((i*n_y+j), n*n_y))
                 # We build and run the circuit
                 circ_x = QuantumCircuit(q)

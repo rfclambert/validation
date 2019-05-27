@@ -4,7 +4,8 @@ from qiskit import BasicAer
 import numpy as np
 from qiskit.tools.visualization import plot_histogram
 from qiskit.providers.aer import UnitarySimulator
-
+from qiskit.compiler import transpile
+from qiskit.transpiler import PassManager
 import random as r
 
 #C:\Users\RaphaelLambert\AppData\Local\Packages\CanonicalGroupLimited.UbuntuonWindows_79rhkp1fndgsc\LocalState\rootfs
@@ -106,7 +107,7 @@ def measure(circ, reg, targ):
 def launch(n, circ):
     """Create a backend and launch circ n times on it"""
     backend_sim = BasicAer.get_backend('qasm_simulator')
-    job_sim = execute(circ, backend_sim, shots=n)
+    job_sim = execute(circ, backend_sim, shots=n, optimization_level=1)
     result_sim = job_sim.result()
     counts = result_sim.get_counts(circ)
     #print(counts)
@@ -119,7 +120,7 @@ def launch2(circ):
     backend = BasicAer.get_backend('statevector_simulator')
     job = execute(circ, backend)
     result = job.result()
-    outputstate = result.get_statevector(circ, decimals=3)
+    outputstate = result.get_statevector(circ, decimals=1)
     print(outputstate)
     return outputstate
 
@@ -762,3 +763,9 @@ def mutation(chaine, force):
             mutate += chaine[i]
         i += 1
     return mutate
+
+
+def lect_bin(counts):
+    for key in counts.keys():
+        print(int(key, 2))
+    return 0

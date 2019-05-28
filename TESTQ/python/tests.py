@@ -10,6 +10,7 @@ from qiskit.aqua.algorithms.many_sample.qsvm._qsvm_estimator import _QSVM_Estima
 from qiskit.aqua.components.multiclass_extensions.all_pairs import *
 from qsvm_datasets import *
 from wavelets import Wavelets
+from qiskit.aqua.algorithms.adaptive.qgan import *
 
 def ccxtest(n):
     """Truth table for cnx"""
@@ -243,7 +244,7 @@ def mult_mod(a,b,nbr,control):
     return circ_m
 
 
-def exp_mod(a,b,nbr):
+def exp_mod(a, b, nbr):
     """mesure b = b*a, a reste a, if control else b = a"""
     bina = [int(x) for x in bin(a)[2:]]
     #binb = [int(x) for x in bin(b)[2:]]
@@ -384,10 +385,11 @@ def test_24():
     counts = launch(2048, circ_m)
     print(counts, len(counts))
 
+
 def test_stat():
     nt = 35
-    age = [18, 19, 21, 20, 23, 22, 19, 19, 19, 19, 27, 24, 23, 18, 17, 24]
-    age.append(29) # niklas
+    age = [18, 19, 21, 20, 23, 22, 19, 19, 19, 19, 27, 24, 23, 18, 17, 24, 29]
+    # age.append(29)  # niklas
     n = len(age)
     mean = np.mean(age)
     var = np.std(age)
@@ -673,22 +675,48 @@ def general_gantest(proba, nbr_qubits):
             Variationer_learn_gan(1000, l, m, proba=proba, n=nbr_qubits, distri_size=0, easy=False)
 
 
+def test_gan_qiskit(n, Database):
+    mini = np.min(Database)
+    maxi = np.max(Database)
+    h = (maxi - mini) / (2 ** n)
+    bins = [[k for d in Database if mini + h * k < d < mini + h * (k + 1)] for k in range(2 ** n)]
+    interv = [mini + h * k for k in range(2 ** n)]
+    backend = BasicAer.get_backend('statevector_simulator')
+    random_seed = 10598
+
+    quantum_instance = QuantumInstance(backend, seed=random_seed, seed_transpiler=random_seed)
+    gan_test = QGAN(Database, num_qubits=[n], snapshot_dir=None,
+                    quantum_instance=quantum_instance, batch_size=int(len(Database) / 20), num_epochs=300)
+    gan_test.train()
+    samp, bins_var = gan_test.generator.get_output(gan_test.quantum_instance, shots=4096)
+
+    compar = [len(b) / len(Database) for b in bins]
+    if len(interv) == len(compar):
+        plt.plot(interv, compar)
+
+    plt.plot(interv, bins_var)
+
+    plt.show()
+
 def test_gan():
     # Variationer_learn_gan(1000, 1, 4096, proba=[1 / 24] * 24 + 8 * [0], n=5, distri_size=0, easy=True)
     nbr_qubits = 5
+    N = 5*10 ** 3
 
-    # beta
-    arr_beta = beta_proba(nbr_qubits)
-    general_gantest(arr_beta, nbr_qubits)
-
-    # uniform not on [0, 32]
-    if nbr_qubits == 5:
-        arr_unif = [1 / 24] * 24 + 8 * [0]
-        general_gantest(arr_unif, nbr_qubits)
-
-    # Normal 0, 1
-    arr_norm = None
-    general_gantest(arr_norm, nbr_qubits)
+    Database = np.random.normal(0, 1, N)
+    test_gan_qiskit(nbr_qubits, Database)
+    # # beta
+    # arr_beta = beta_proba(nbr_qubits)
+    # general_gantest(arr_beta, nbr_qubits)
+    #
+    # # uniform not on [0, 32]
+    # if nbr_qubits == 5:
+    #     arr_unif = [1 / 24] * 24 + 8 * [0]
+    #     general_gantest(arr_unif, nbr_qubits)
+    #
+    # # Normal 0, 1
+    # arr_norm = None
+    # general_gantest(arr_norm, nbr_qubits)
 
 
 # test_svm_quantique()

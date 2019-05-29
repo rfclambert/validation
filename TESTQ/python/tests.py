@@ -667,12 +667,12 @@ def general_gantest(proba, nbr_qubits):
             print("Easy mode results for m={} and l={}:".format(m, l))
             Variationer_learn_gan(1000, l, m, proba=proba, n=nbr_qubits, distri_size=0, easy=True)
             print("\n")
-            print("Distribution learning results for m={} and l={}:".format(m, l))
-            for d in [256, 512]:
-                print("For ", d, ": ")
-                Variationer_learn_gan(1000, l, m, proba=proba, n=nbr_qubits, distri_size=d, easy=False)
-            print("Singleton learning results for m={} and l={}:".format(m, l))
-            Variationer_learn_gan(1000, l, m, proba=proba, n=nbr_qubits, distri_size=0, easy=False)
+            # print("Distribution learning results for m={} and l={}:".format(m, l))
+            # for d in [256, 512]:
+            #     print("For ", d, ": ")
+            #     Variationer_learn_gan(1000, l, m, proba=proba, n=nbr_qubits, distri_size=d, easy=False)
+            # print("Singleton learning results for m={} and l={}:".format(m, l))
+            # Variationer_learn_gan(1000, l, m, proba=proba, n=nbr_qubits, distri_size=0, easy=False)
 
 
 def test_gan_qiskit(n, Database):
@@ -701,10 +701,10 @@ def test_gan_qiskit(n, Database):
 def test_gan():
     # Variationer_learn_gan(1000, 1, 4096, proba=[1 / 24] * 24 + 8 * [0], n=5, distri_size=0, easy=True)
     nbr_qubits = 5
-    N = 5*10 ** 3
-
-    Database = np.random.normal(0, 1, N)
-    test_gan_qiskit(nbr_qubits, Database)
+    # N = 5*10 ** 3
+    #
+    # Database = np.random.normal(0, 1, N)
+    # test_gan_qiskit(nbr_qubits, Database)
     # # beta
     # arr_beta = beta_proba(nbr_qubits)
     # general_gantest(arr_beta, nbr_qubits)
@@ -714,9 +714,9 @@ def test_gan():
     #     arr_unif = [1 / 24] * 24 + 8 * [0]
     #     general_gantest(arr_unif, nbr_qubits)
     #
-    # # Normal 0, 1
-    # arr_norm = None
-    # general_gantest(arr_norm, nbr_qubits)
+    # Normal 0, 1
+    arr_norm = None
+    general_gantest(arr_norm, nbr_qubits)
 
 
 # test_svm_quantique()

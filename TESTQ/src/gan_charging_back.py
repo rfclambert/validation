@@ -20,6 +20,19 @@ def norm1(f, g):
     return res
 
 
+def cross_entropy(q, p):
+    """technically the kl divergence"""
+    assert(len(q) == len(p))
+    res = 0
+    for i in range(len(q)):
+        if q[i] <= 10**-5:
+            q[i] = 10**-5
+        if p[i] <= 10**-5:
+            p[i] = 10**-5
+        res += p[i]*np.log(p[i]/q[i])
+    return res
+
+
 def Variationer_learn_gan(shots, l, m, proba=None, n=4, distri_size=0, easy=False):
     """Learn the theta to match the distribution.
     Shots is the amount optimization steps.
@@ -150,7 +163,7 @@ def Variationer_learn_gan(shots, l, m, proba=None, n=4, distri_size=0, easy=Fals
 
         # L1 distance calculation
         compar = [len(b) / N for b in bins]
-        err_theta = norm1(compar, bins_var)
+        err_theta = cross_entropy(bins_var, compar)
 
         curve.append(err_theta)
         if len(curve) % 100 == 0:

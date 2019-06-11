@@ -147,8 +147,9 @@ def ad_hoc_data(training_size, test_size, n, gap, PLOT_DATA):
             training_size+test_size)] for k, key in enumerate(class_labels)}
 
         if PLOT_DATA:
-            img = plt.imshow(np.asmatrix(sample_Total).T, interpolation='nearest',
-                             origin='lower', cmap='copper', extent=[0, 2*np.pi, 0, 2*np.pi])
+            print(1+np.asmatrix(sample_Total).T)
+            img = plt.imshow(1+np.asmatrix(sample_Total).T, interpolation='nearest',
+                             origin='lower', cmap='rainbow', extent=[0, 2*np.pi, 0, 2*np.pi])
             plt.show()
             fig2 = plt.figure()
             for k in range(0, 2):

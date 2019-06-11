@@ -583,10 +583,10 @@ def test_svm():
 
     # gaussian
     pres = "Test pour des données gaussiennes (moyen, classique)"
-    for _ in range(5):
+    for _ in range(1):
         print("\n")
         print("New iteration")
-        test_from_func(pres, 15, 10, 2, False, Gaussian, quantum_instance)
+        test_from_func(pres, 25, 10, 2, True, Gaussian, quantum_instance)
         print("\n")
 
     # small adn strings
@@ -720,11 +720,11 @@ def test_gan():
 
 
 # test_svm_quantique()
-# test_svm()
+test_svm()
 # test_compar(1.9)
 # test_stat()
 # test_24()
 # test_arith()
 # test_QFTn(3)
 # test_draw()
-test_gan()
+# test_gan()

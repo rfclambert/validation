@@ -53,12 +53,13 @@ def oracletest(n):
     b = bina(n)
     for bi in b:
         print(bi)
-        q = QuantumRegister(n, 'q')
+        q = QuantumRegister(n+1, 'q')
         circ = QuantumCircuit(q)
-        circ.h(q)
+        for i in range(n):
+            circ.h(q[i])
         # for i in bi:
         #    circ.x(q[i])
-        oracle(circ, q, n, bi)
+        oracle_o(circ, q, n, bi)
         circ.barrier(q)
         launch2(circ)
         circ_m = measure(circ, q, [i for i in range(n)])
@@ -719,8 +720,11 @@ def test_gan():
     general_gantest(arr_norm, nbr_qubits)
 
 
+def test_imag(online=False):
+    presentation_imag(online)
+
 # test_svm_quantique()
-test_svm()
+# test_svm()
 # test_compar(1.9)
 # test_stat()
 # test_24()
@@ -728,3 +732,5 @@ test_svm()
 # test_QFTn(3)
 # test_draw()
 # test_gan()
+test_imag(True)
+# oracletest(2)

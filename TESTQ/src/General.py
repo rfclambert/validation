@@ -556,9 +556,34 @@ def cmultmod(circ, q, control, X, a, A, Y, n, N, binn, lost, lost2):
                 circ.ccx(control, X[i], A[j])
     # if not control, we load X in Y because it would be empty
     circ.x(control)
-    for i in range(len(X)):
+    for i in range(min(len(X), len(Y))):
         circ.ccx(control, X[i], Y[i])
     circ.x(control)
+    # note that for it to work, Y need to be empty at the start
+    # A=0->0;X->X,Y=0->X if not control else x*a, N->N
+
+
+def multmod(circ, q, X, a, A, Y, n, N, binn, lost, lost2):
+    """control the control qbit, X the list of qbits of b, bina the bitlist of a,
+    A the list of qbits (at zero) with enough place to put a, Y the res register,
+    N the modulo register, binn its bitlist and lost and lost2 two ancillas
+    X->X Y->b*y if control else 0 A=0->0 N=0->0"""
+    # We have to precompute the different a*2**i to be added if b_i
+    binapow = [[int(x) for x in bin((powmod(2, i, n) * a) % n)[2:]] for i in range(len(X))]
+    for i in range(len(binapow)):
+        binapow[i].reverse()
+    # For each bit in X
+    for i in range(len(X)):
+        # We conditionally load a*2**i%n in A for the addition. if not control, it will be 0
+        for j in range(len(binapow[i])):
+            if binapow[i][j]:
+                circ.cx(X[i], A[j])
+        # We add either 0 or a*2**i%n depending on control and the i-th bit of X
+        addmod(circ, q, A, Y, lost, Y[-1], N, lost2, binn)
+        # We unload what was in A
+        for j in range(len(binapow[i])):
+            if binapow[i][j]:
+                circ.cx(X[i], A[j])
     # note that for it to work, Y need to be empty at the start
     # A=0->0;X->X,Y=0->X if not control else x*a, N->N
 
@@ -616,6 +641,8 @@ def expmod(circ, q, X, a, A, APOW, Y, n, N, binn, lost, lost2):
 
 def fracf(N, S):
     """We suppose S = k*N/L. Return k,L. Ex: N=10000, S = 66667, res = 1,3"""
+    if N == 0 or S == 0:
+        return 0, 0
     L = [N, S]
     Lneg = [-S]
     T = []
@@ -768,4 +795,76 @@ def mutation(chaine, force):
 def lect_bin(counts):
     for key in counts.keys():
         print(int(key, 2))
+    return 0
+
+
+def circuit_simon(maxQ, N, nbr):
+    binn = [int(x) for x in bin(N)[2:]]  # The binlist of N
+    binn.reverse()
+    bits_N = len(binn)  # number of bits of N
+    bits_X = maxQ - (bits_N*3 + 3)
+    nX = bits_X  # q[nX] debut de Y
+    nXY = nX + bits_N + 1  # q[nXY] debut de N
+    nXYN = nXY + bits_N  # q[nXYN] debut de A
+    n = nXYN + bits_N  # Total de qbit chargés
+    q = QuantumRegister(n + 2, 'q')  # +lost+lost2=+2
+    circ = QuantumCircuit(q)
+    lost2 = q[-1]
+    lost = q[-2]
+    RegX = [q[i] for i in range(bits_X)]
+    RegY = [q[i + nX] for i in range(nXY - nX)]
+    RegN = [q[i + nXY] for i in range(nXYN - nXY)]
+    RegA = [q[i + nXYN] for i in range(n - nXYN)]
+    print(bits_N, bits_X, nXY, n+2)
+    # Uniform superposition on X
+    for reg in RegX:
+        circ.h(reg)
+    # Setting of N
+    for reg in [RegN[i] for i in range(bits_N) if binn[i]]:
+        circ.x(reg)  # Set N
+
+    multmod(circ, q, RegX, nbr, RegA, RegY, N, RegN, binn, lost, lost2)
+    QFTn(circ, q, RegX)
+
+    circ_m = measure_direct(circ, q, RegX + RegY)
+    return circ_m
+
+
+def extract_bin(counts, bits_N):
+    res = []
+    for key in counts.keys():
+        res.append(int(key[bits_N:], 2))
+    return res
+
+
+def presentation_imag(online=False):
+    circ_m = circuit_simon(20, 7, 13)
+    print(circ_m.depth(), circ_m.width())
+    if online:
+        print("Loading...")
+        from qiskit import IBMQ
+        IBMQ.load_accounts()
+        print("Done!")
+        name = 'ibmq_qasm_simulator'
+        backend_sim = IBMQ.get_backend(name, hub=None)  # BasicAer.get_backend('qasm_simulator')
+        print("Sending quantum circuit to hardware " + name + ", waiting for the result...")
+        job_sim = execute(circ_m, backend_sim, shots=10, max_credits=3, optimization_level=1)
+        result_sim = job_sim.result()
+        counts = result_sim.get_counts(circ_m)
+    else:
+        counts = launch(10, circ_m)
+    print(counts)
+    kM = extract_bin(counts, 4)
+    print(kM)
+    res = []
+    co = []
+    for kiM in kM:
+        temp = fracf(2**8, kiM)
+        print(temp)
+        if temp[1] not in res:
+            res.append(temp[1])
+            co.append(1)
+        else:
+            co[res.index(temp[1])] += 1
+    print("La periode est de:", res[co.index(max(co))])
     return 0

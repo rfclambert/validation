@@ -6,7 +6,7 @@ IBMQ.load_accounts()
 
 def shor_quant(A, N, maxQ):
     """Builds the quantum circuit for the period estimation part of shor"""
-    binn = [int(x) for x in bin(N)[2:]] # The binlist of N
+    binn = [int(x) for x in bin(N)[2:]]  # The binlist of N
     binn.reverse()
     bits_N = len(binn)  # number of bits of N
     bits_X = maxQ - (4 * bits_N + 3) - (maxQ - (4*bits_N + 3)) % 2  # number of bits of X, must be even
@@ -37,11 +37,11 @@ def shor_quant(A, N, maxQ):
     RegAPOW = [q[i + nXYNA] for i in range(n - nXYNA)]
 
     # Uniform superposition on X
-    for r in RegX:
-        circ.h(r)
+    for reg in RegX:
+        circ.h(reg)
     # Setting of N
-    for r in [RegN[i] for i in range(bits_N) if binn[i]]:
-        circ.x(r)  # Set N
+    for reg in [RegN[i] for i in range(bits_N) if binn[i]]:
+        circ.x(reg)  # Set N
 
     # Main call: the modular exponentiation
 

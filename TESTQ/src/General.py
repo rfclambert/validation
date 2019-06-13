@@ -650,11 +650,11 @@ def fracf(N, S):
         L.append(L[-2] % L[-1])
         T.append(L[-3] // L[-2])
         Lneg.append((L[-3] % L[-2]) - L[-2])
-        print(L, T, Lneg)
+        #print(L, T, Lneg)
     Backtrack = [(T[-1]+1*(Lneg[-1]>-10)), 1]
     for i in range(len(T)-1):
         Backtrack = [T[-2-i]*Backtrack[0]+Backtrack[1]]+Backtrack
-    print(Backtrack)
+    #print(Backtrack)
     return Backtrack[1], Backtrack[0]
 
 
@@ -815,7 +815,8 @@ def circuit_simon(maxQ, N, nbr):
     RegY = [q[i + nX] for i in range(nXY - nX)]
     RegN = [q[i + nXY] for i in range(nXYN - nXY)]
     RegA = [q[i + nXYN] for i in range(n - nXYN)]
-    print(bits_N, bits_X, nXY, n+2)
+    print("Qubits used by the modulo : ", bits_N, "Qubits available for superposition : ",
+          bits_X, "Total Qubit used : ", n+2)
     # Uniform superposition on X
     for reg in RegX:
         circ.h(reg)
@@ -839,7 +840,7 @@ def extract_bin(counts, bits_N):
 
 def presentation_imag(online=False):
     circ_m = circuit_simon(20, 7, 13)
-    print(circ_m.depth(), circ_m.width())
+    print("Circuit depth before transpilation : ", circ_m.depth())
     if online:
         print("Loading...")
         from qiskit import IBMQ
@@ -853,9 +854,9 @@ def presentation_imag(online=False):
         counts = result_sim.get_counts(circ_m)
     else:
         counts = launch(10, circ_m)
-    print(counts)
+    print("Raw Bitstrings measured : ", counts.keys())
     kM = extract_bin(counts, 4)
-    print(kM)
+    print("Frequencies measured : ", kM)
     res = []
     co = []
     for kiM in kM:

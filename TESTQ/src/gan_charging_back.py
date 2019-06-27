@@ -3,7 +3,7 @@ from sklearn.neural_network import MLPClassifier
 import matplotlib.pyplot as plt
 
 from qiskit.aqua.components.optimizers import SPSA
-from scipy.stats import beta
+from scipy.stats import beta, nbinom
 
 
 def sum_l(L):
@@ -390,10 +390,34 @@ def constants():
     return normal, t_1_4096_cartes
 
 
-def beta_proba(nbr_qubits):
-    a, b = 5, 1
+def beta_proba(nbr_qubits, a, b):
     n = 2**nbr_qubits
     arr = np.linspace(0, 1, n)
     res = beta.pdf(arr, a, b)
+    plt.plot(arr, res)
+    plt.show()
+    res *= 1/sum(res)
+    return res
+
+
+def nbinom_proba(nbr_qubits, a):
+    n = 2**nbr_qubits
+    arr = np.linspace(0, n, n+1)
+    print(arr)
+    for b in np.linspace(0.1, 0.9, 6):
+        print(b)
+        res = nbinom.pmf(arr, a, b)
+        print(res)
+        plt.plot(arr, res)
+    plt.show()
+    b = 0.5
+    for a in range(1, 20, 5):
+        for b in np.linspace(0.1, 0.9, 4):
+            print(a, b)
+            res = nbinom.pmf(arr, a, b)
+            print(np.sum(res*arr), a, b, a*(1-b)/b, a*b/(1-b))
+            print(res)
+            plt.plot(arr, res)
+    plt.show()
     res *= 1/sum(res)
     return res

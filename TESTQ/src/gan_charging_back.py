@@ -7,6 +7,7 @@ from scipy.stats import beta, nbinom
 
 
 def sum_l(L):
+    """sum of what inside a list, even if not integers"""
     res = []
     for l in L:
         res += l
@@ -14,6 +15,7 @@ def sum_l(L):
 
 
 def norm1(f, g):
+    """norm 1 of two lists of points of th esame size"""
     res = 0
     for i in range(len(f)):
         res += np.abs(f[i]-g[i])
@@ -239,6 +241,7 @@ def Variational_prepared(theta, n):
 
 
 def mosel():
+    """To test a lot of parameters for model selection"""
     res = []
     for shots in [500, 1000]:
         for l in range(1, 6):
@@ -391,6 +394,7 @@ def constants():
 
 
 def beta_proba(nbr_qubits, a, b):
+    """returns 2**nbr_qubits values of beta(a, b)"""
     n = 2**nbr_qubits
     arr = np.linspace(0, 1, n)
     res = beta.pdf(arr, a, b)
@@ -401,6 +405,7 @@ def beta_proba(nbr_qubits, a, b):
 
 
 def nbinom_proba(nbr_qubits, a):
+    """returns 2**nbr_qubits values of nbinom(a)"""
     n = 2**nbr_qubits
     arr = np.linspace(0, n, n+1)
     print(arr)

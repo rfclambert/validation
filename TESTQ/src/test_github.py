@@ -47,7 +47,7 @@ def link_breaker(text):
 
 
 def main():
-    """Will send any unchecked message to github"""
+    """Will send any unchecked messages to github"""
     verbose = False
     online = True
 
@@ -87,7 +87,7 @@ def main():
             if len(body) > 0:
                 raw_text = body[0]['content']
             else:
-                raw_text = "message chiffré"
+                raw_text = "unable to retrieve the message"
             raw_text = link_breaker(raw_text)
             num_get = 0
             if online and title[:4] == 'Re  ' and title[4:] in treated:
@@ -112,10 +112,6 @@ def main():
     with open(join(path, 'issues.txt'), 'w') as doc:
         for title in issues:
             doc.write(str(title)+'\n')
-    # doc = open(join(path, 'log.txt'), 'w')
-    # doc.close()
-    # doc = open(join(path, 'issues.txt'), 'w')
-    # doc.close()
 
 
 if __name__ == "__main__":

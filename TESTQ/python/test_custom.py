@@ -55,7 +55,7 @@ def main():
 
     entangler_map = {0:[1]} # qubit 0 linked to qubit 1
 
-# Here we use all available parameters for the simple feature maps
+    # Here we use all available parameters for the simple feature maps
     # (entanglement='full' won't be used because we provide entangler_map)
 
     #feature_map = CustomExpansion(num_qubits=feature_dim, constructor_function=constructor_function, feature_param=[2])

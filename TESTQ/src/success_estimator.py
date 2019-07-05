@@ -6,6 +6,7 @@ from scipy.stats import nbinom, norm
 import numpy as np
 from scipy.special import binom
 
+# Not made by me for the most part. see @mtillet for his work
 
 def cata(n):
     return binom(2*n, n)/(n+1)

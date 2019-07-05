@@ -758,6 +758,7 @@ def W(circ, q, RegX, Theta):
 
 
 def sum_l_str(L):
+    """returns the string contained in a list of strings"""
     res = ''
     for l in L:
         res += l
@@ -765,6 +766,7 @@ def sum_l_str(L):
 
 
 def genere_chains(n, sub):
+    """Returns two strings: one of size n, and a mutated one of size n with sub differences"""
     assert(sub < n)
     Letters = ['A', 'C', 'T', 'G']
     correct_string = ''
@@ -803,12 +805,14 @@ def mutation(chaine, force):
 
 
 def lect_bin(counts):
+    """prints the values of a collection of binary keys"""
     for key in counts.keys():
         print(int(key, 2))
     return 0
 
 
 def circuit_simon(maxQ, N, nbr):
+    """simon algorithm example for ensimag presentation"""
     binn = [int(x) for x in bin(N)[2:]]  # The binlist of N
     binn.reverse()
     bits_N = len(binn)  # number of bits of N
@@ -842,6 +846,7 @@ def circuit_simon(maxQ, N, nbr):
 
 
 def extract_bin(counts, bits_N):
+    """returns the base 10 values of a collection of binary keys"""
     res = []
     for key in counts.keys():
         res.append(int(key[bits_N:], 2))
@@ -849,6 +854,7 @@ def extract_bin(counts, bits_N):
 
 
 def presentation_imag(online=False):
+    """The main code for the presentation for ENSIAMG"""
     circ_m = circuit_simon(20, 7, 13)
     print("Circuit depth before transpilation : ", circ_m.depth())
     if online:
@@ -900,6 +906,7 @@ def graph_to_clause(V, E, k):
 
 
 def sat_to_3sat(Sat, nbr_var):
+    """transform a SAT instance to 3 SAT instance (not finished)"""
     var_sup = 0
     for clause in Sat:
         if len(clause) == 2:

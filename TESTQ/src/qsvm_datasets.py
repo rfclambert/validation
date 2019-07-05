@@ -27,6 +27,7 @@ from sklearn.decomposition import PCA
 
 
 def ad_hoc_data(training_size, test_size, n, gap, PLOT_DATA):
+    """Data made for the QSVM to be effective"""
     class_labels = [r'A', r'B']
     if n == 2:
         N = 100

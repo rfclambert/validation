@@ -570,20 +570,20 @@ def test_svm():
     quantum_instance = QuantumInstance(backend, seed=random_seed, seed_transpiler=random_seed)
 
     # iris
-    # pres = "Test pour le data set Iris (facile, classique)"
-    #test_from_func(pres, 15, 10, 3, True, Iris, quantum_instance)
+    pres = "Test pour le data set Iris (facile, classique)"
+    test_from_func(pres, 15, 10, 3, True, Iris, quantum_instance)
 
     # breast cancer
-    # pres = "Test pour le data set Breast Cancer (facile, classique)"
-    #test_from_func(pres, 15, 10, 3, True, Breast_cancer, quantum_instance)
+    pres = "Test pour le data set Breast Cancer (facile, classique)"
+    test_from_func(pres, 15, 10, 3, True, Breast_cancer, quantum_instance)
 
     # digits
-    # pres = "Test pour le data set Digits (difficile, classique)"
-    # test_from_func(pres, 10, 10, 10, True, Digits, quantum_instance)
+    pres = "Test pour le data set Digits (difficile, classique)"
+    test_from_func(pres, 10, 10, 10, True, Digits, quantum_instance)
 
     # wine
-    # pres = "Test pour le data set Wine (moyen, classique)"
-    #test_from_func(pres, 15, 10, 5, True, Wine, quantum_instance)
+    pres = "Test pour le data set Wine (moyen, classique)"
+    test_from_func(pres, 15, 10, 5, True, Wine, quantum_instance)
 
     # gaussian
     pres = "Test pour des données gaussiennes (moyen, classique)"
@@ -594,8 +594,8 @@ def test_svm():
         print("\n")
 
     # small adn strings
-    # pres = "Test pour des séquences ADN courtes (difficile, classique)"
-    #test_from_func(pres, 10, 15, 14, True, Sequence, quantum_instance)
+    pres = "Test pour des séquences ADN courtes (difficile, classique)"
+    test_from_func(pres, 10, 15, 14, True, Sequence, quantum_instance)
 
 
 def test_svm_quantique():
@@ -926,4 +926,4 @@ def test_clause():
 # test_new()
 # test_fonction_p()
 # test_fonction()
-test_clause()
+# test_clause()

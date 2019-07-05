@@ -453,33 +453,3 @@ def test_string(n, nbr_qbits, choice, method):
 
 
 
-
-
-#built_inVar()
-# gener = stock_get(20, 0.3)  # generation(20, 0.3)
-# data_learn = [[gener[0][i], -1] for i in range(len(gener[0])//2)] + [[gener[1][i], 1] for i in range(len(gener[1])//2)]
-# test = [[gener[0][i], -1] for i in range(len(gener[0])//2, len(gener[0]))] +\
-#       [[gener[1][i], 1] for i in range(len(gener[1])//2, len(gener[1]))]
-# Variationer_learn(data_learn, 100, 3, 10**-10, test)
-
-
-# gener = stock_get(20, 0.3)
-# #gener = stock(20, 0.3)
-# print(gener)
-# data_learn = [gener[0][i] for i in range(len(gener[0])//2)] + [gener[1][i] for i in range(len(gener[1])//2)]
-# data_lab = [-1 for i in range(len(gener[0])//2)] + [1 for i in range(len(gener[1])//2)]
-# print(data_learn, data_lab)
-# test = [gener[0][i] for i in range(len(gener[0])//2, len(gener[0]))] +\
-#        [gener[1][i] for i in range(len(gener[1])//2, len(gener[1]))]
-# test_lab = [-1 for i in range(len(gener[0])//2, len(gener[0]))] +\
-#        [1 for i in range(len(gener[1])//2, len(gener[1]))]
-# print(test, test_lab)
-# #kernel_estimation(data_learn, data_lab, test, test_lab)
-# classical_kernel_estimation(data_learn, data_lab, test, test_lab)
-# test_iris()
-# print(genere_chains(15,4))
-# est_string(20, 15, 'genere', 'trunc')
-
-#stock_compl()
-
-

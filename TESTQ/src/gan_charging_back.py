@@ -3,6 +3,7 @@ from sklearn.neural_network import MLPClassifier
 import matplotlib.pyplot as plt
 
 from qiskit.aqua.components.optimizers import SPSA
+from qiskit.aqua.components.uncertainty_models import NormalDistribution
 from scipy.stats import beta, nbinom
 
 
@@ -35,7 +36,7 @@ def cross_entropy(q, p):
     return res
 
 
-def Variationer_learn_gan(shots, l, m, proba=None, n=4, distri_size=0, easy=False):
+def Variationer_learn_gan(shots, l, m, proba=None, n=4, distri_size=0, easy=False, prior=False):
     """Learn the theta to match the distribution.
     Shots is the amount optimization steps.
     l is the depth of the variationner.
@@ -95,6 +96,19 @@ def Variationer_learn_gan(shots, l, m, proba=None, n=4, distri_size=0, easy=Fals
 
     # To keep track of what's done
     curve = []
+    # parameters
+    low = 0
+    high = 10
+
+    # initialize distribution
+    mu = 5
+    sigma = 1
+    normal = NormalDistribution(n, mu, sigma, low, high)
+
+    # create circuit for distribution
+    q_normal = QuantumRegister(n)
+    qc_normal = QuantumCircuit(q)
+    normal.build(qc_normal, q_normal)
 
     def Remp(theta):
         """The error function"""
@@ -102,6 +116,8 @@ def Variationer_learn_gan(shots, l, m, proba=None, n=4, distri_size=0, easy=Fals
         circ = QuantumCircuit(q)
         W(circ, q, RegX, theta)
         circ_var = circ
+        if prior:
+            circ_var = qc_normal+circ_var
         circ_m = measure_direct(circ_var, q, RegX)
         counts = launch(m, circ_m)
 
@@ -154,6 +170,8 @@ def Variationer_learn_gan(shots, l, m, proba=None, n=4, distri_size=0, easy=Fals
         circ = QuantumCircuit(q)
         W(circ, q, RegX, theta)
         circ_var = circ
+        if prior:
+            circ_var = qc_normal+circ_var
         circ_m = measure_direct(circ_var, q, RegX)
         counts = launch(m, circ_m)
 
@@ -182,6 +200,9 @@ def Variationer_learn_gan(shots, l, m, proba=None, n=4, distri_size=0, easy=Fals
         theta_star = optimizer.optimize(2 * n * (l + 1), Remp, initial_point=Theta)
 
     plt.plot([i for i in range(len(curve))], curve)
+    plt.xlabel("Iterations")
+    plt.ylabel("Loss")
+    plt.title("Loss function")
     plt.show()
 
     print("Learning done! \nDebut du test...")
@@ -203,6 +224,9 @@ def Variationer_learn_gan(shots, l, m, proba=None, n=4, distri_size=0, easy=Fals
     if len(interv) == len(compar_test):
         plt.plot(interv, compar_test)
     plt.plot(interv, bins_var_test)
+    plt.xlabel("x")
+    plt.ylabel("density")
+    plt.title("PDF loaded in the Quantum Channel (orange)")
     plt.show()
     err_theta_test = norm1(compar_test, bins_var_test)
     print("Error L1: ", err_theta_test)

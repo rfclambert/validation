@@ -82,4 +82,5 @@ class CustomExpansion(FeatureMap):
         if qr is None:
             qr = QuantumRegister(self._num_qubits, name='q')
         qc = self._constructor_function(x, qr, inverse, *self._feature_param)
+        #qc.draw(output='mpl', filename='C:/Users/RaphaelLambert/Pictures/custom.png')
         return qc

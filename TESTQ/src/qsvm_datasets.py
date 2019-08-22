@@ -17,6 +17,7 @@
 
 import numpy as np
 import scipy
+import random as r
 from scipy.linalg import expm
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
@@ -294,7 +295,7 @@ def sample_ad_hoc_data(sample_Total, test_size, n):
 
 
 def general_transformation(data, target, class_labels, plot_name, training_size, test_size, n, PLOT_DATA):
-    sample, _, label, _ = train_test_split(data, target, train_size=0.99, test_size=0.01, random_state=12)
+    sample, _, label, _ = train_test_split(data, target, train_size=0.99, test_size=0.01, random_state=r.randrange(20), shuffle=True)
 
     # Now we standarize for gaussian around 0 with unit variance
     std_scale = StandardScaler().fit(sample)
@@ -320,6 +321,7 @@ def general_transformation(data, target, class_labels, plot_name, training_size,
             training_size + test_size)] for k, key in enumerate(class_labels)}
 
     if PLOT_DATA:
+        print(sample[label == k, 0][:training_size], sample[label == k, 1][:training_size])
         for k in range(len(class_labels)):
             plt.scatter(sample[label == k, 0][:training_size],
                         sample[label == k, 1][:training_size])

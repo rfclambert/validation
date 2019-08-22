@@ -7,6 +7,9 @@ from qiskit.providers.aer import UnitarySimulator
 from qiskit.compiler import transpile
 from qiskit.transpiler import PassManager
 import random as r
+from qiskit import IBMQ
+IBMQ.load_accounts()
+
 
 #C:\Users\RaphaelLambert\AppData\Local\Packages\CanonicalGroupLimited.UbuntuonWindows_79rhkp1fndgsc\LocalState\rootfs
 
@@ -851,6 +854,14 @@ def extract_bin(counts, bits_N):
     for key in counts.keys():
         res.append(int(key[bits_N:], 2))
     return res
+
+
+def launch_hardware(circ, shots):
+    backend_hardware = IBMQ.get_backend('ibmq_16_melbourne')
+    job_sim = execute(circ, backend_hardware, shots=shots, optimization_level=1)
+    result_sim = job_sim.result()
+    counts = result_sim.get_counts(circ)
+    return counts
 
 
 def presentation_imag(online=False):

@@ -211,16 +211,16 @@ def built_inVar():
     print("testing success ratio: ", result['testing_accuracy'])
 
 
-def Variationer_learn(data, shots, l, epsilon, test=None):
+def Variationer_learn(data, shots, l, epsilon, test=None, labels=[0, 1]):
     """Learn the theta to find the data. data is of the form list (list (tuple label)).
     Shots is the amount of shots to take for the empirical evaluation of p_y.
     l is the depth of the variationner"""
     # Number of qubits used
-    n = len(data[0])
+    n = len(data[0][0])
     # Initial random theta
     Theta = np.random.normal(0, 1, 2*n*(l+1))
     # Initial circuit
-    q = QuantumRegister(2, 'q')
+    q = QuantumRegister(n, 'q')
     RegX = [q[i] for i in range(n)]
     # To keep track of what's done
     curve = []
@@ -251,12 +251,12 @@ def Variationer_learn(data, shots, l, epsilon, test=None):
             resm = 0.5 * (1 - res)
             resp = 0.5 * (1 + res)
             # We compute the error of this data (either cross entropy or binomial error)
-            if data[i][1] == 1:
-                #err_theta += pmdm(shots, resp, 1, 0)#clamp(theta[-1], -0.1, 0.1))
-                err_theta -= np.log(clamp(resp, epsilon, 1-epsilon))
+            if data[i][1] == labels[1]:
+                err_theta += pmdm(shots, resp, 1, 0)#clamp(theta[-1], -0.1, 0.1))
+                #err_theta -= np.log(clamp(resp, epsilon, 1-epsilon))
             else:
-                #err_theta += pmdm(shots, resm, -1, 0)#clamp(theta[-1], -0.1, 0.1))
-                err_theta -= np.log(clamp(resm, epsilon, 1-epsilon))
+                err_theta += pmdm(shots, resm, -1, 0)#clamp(theta[-1], -0.1, 0.1))
+                #err_theta -= np.log(clamp(resm, epsilon, 1-epsilon))
         # The error for this theta
         print(err_theta/len(data))
         curve.append(err_theta/len(data))
@@ -289,10 +289,10 @@ def Variationer_learn(data, shots, l, epsilon, test=None):
         resm_test = 0.5 * (1 - res_test)
         resp_test = 0.5 * (1 + res_test)
         if resm_test > resp_test:
-            if datum[1] == -1:
+            if datum[1] == labels[0]:
                 success += 100/len(test)
         else:
-            if datum[1] == 1:
+            if datum[1] == labels[1]:
                 success += 100/len(test)
     print("Pourcentage de succes:", success)
     return theta_star[1]

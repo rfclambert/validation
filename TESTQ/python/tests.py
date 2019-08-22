@@ -454,6 +454,18 @@ def my_impl(in_train, in_test, labels):
     kernel_estimation(X_train, Y_train, X_test, Y_test)
 
 
+def my_impl_variational(in_train, in_test, labels):
+    X_train = []
+    X_test = []
+    for lab in labels:
+        for datum in in_train[lab]:
+            X_train.append([datum, lab])
+        for datum in in_test[lab]:
+            X_test.append([datum, lab])
+    Variationer_learn(X_train, 500, 1, 0.01, X_test, labels)
+    #kernel_estimation(X_train, Y_train, X_test, Y_test)
+
+
 def custom_constr(x, qr, inverse, depth):
     qc = QuantumCircuit(qr)
     maxi, mini = max(x), min(x)
@@ -473,6 +485,28 @@ def custom_constr(x, qr, inverse, depth):
     if inverse:
         return qc.inverse()
     return qc
+
+
+def concat_succ(L):
+    """return the successive concatenation"""
+    if len(L) < 2:
+        return L
+    res = []
+    last = L.pop()
+    othe = L.pop()
+    for i in last:
+        for j in othe:
+            if type(i) is list:
+                if type(j) is list:
+                    res.append(i+j)
+                else:
+                    res.append(i+[j])
+            elif type(j) is list:
+                res.append([i] + j)
+            else:
+                res.append([i] + [j])
+    L = [res] + L
+    return concat_succ(L)
 
 
 def test_from_func(pres, nbr_by_label, nbr_by_label_test, nbr_comp, plot_graph, function, quantum_instance):
@@ -495,6 +529,9 @@ def test_from_func(pres, nbr_by_label, nbr_by_label_test, nbr_comp, plot_graph, 
                     test_dataset=samp_test)
 
     result = qsvm.run(quantum_instance)
+    if nbr_comp == 0:
+        total_map = qsvm.predict(np.array(concat_succ([[i/20 for i in range(-3*20, 3*20)] for _ in range(nbr_comp)])[0]), quantum_instance)
+        print(total_map)
     print("Success of the FirstOrder feature map kernel:")
     print(result['testing_accuracy'])
 
@@ -527,6 +564,17 @@ def test_from_func(pres, nbr_by_label, nbr_by_label_test, nbr_comp, plot_graph, 
     result = qsvm.run(quantum_instance)
     print("Success of the Custom feature map kernel:")
     print(result['testing_accuracy'])
+
+    return 0
+
+
+def test_from_func_variational(pres, nbr_by_label, nbr_by_label_test, nbr_comp, plot_graph, function):
+    print(pres)
+    _, samp_train, samp_test, labels = function(nbr_by_label, nbr_by_label_test, nbr_comp, plot_graph)
+
+    if len(labels) == 2:
+        print("Success for my implementation (second order, variational):")
+        my_impl_variational(samp_train, samp_test, labels)
 
     return 0
 
@@ -565,7 +613,7 @@ def Sequence(nbr_by_label, nbr_by_label_test, nbr_comp, plot_graph):
 
 def test_svm():
     backend = BasicAer.get_backend('statevector_simulator')
-    random_seed = 10598
+    random_seed = r.randint(1, 10598)
 
     quantum_instance = QuantumInstance(backend, seed=random_seed, seed_transpiler=random_seed)
 
@@ -578,8 +626,8 @@ def test_svm():
     test_from_func(pres, 15, 10, 3, True, Breast_cancer, quantum_instance)
 
     # digits
-    pres = "Test pour le data set Digits (difficile, classique)"
-    test_from_func(pres, 10, 10, 10, True, Digits, quantum_instance)
+    #pres = "Test pour le data set Digits (difficile, classique)"
+    #test_from_func(pres, 10, 10, 10, True, Digits, quantum_instance)
 
     # wine
     pres = "Test pour le data set Wine (moyen, classique)"
@@ -665,18 +713,65 @@ def test_svm_quantique():
     print(result_me['testing_accuracy'])
 
 
+def test_variational():
+    # iris
+    #pres = "Test pour le data set Iris (facile, classique)"
+    #test_from_func_variational(pres, 15, 10, 3, True, Iris)
+
+    # breast cancer
+    pres = "Test pour le data set Breast Cancer (facile, classique)"
+    test_from_func_variational(pres, 15, 10, 3, True, Breast_cancer)
+
+    # digits
+    # pres = "Test pour le data set Digits (difficile, classique)"
+    # test_from_func(pres, 10, 10, 10, True, Digits, quantum_instance)
+
+    # wine
+    # pres = "Test pour le data set Wine (moyen, classique)"
+    # test_from_func(pres, 15, 10, 5, True, Wine, quantum_instance)
+
+    # gaussian
+    pres = "Test pour des données gaussiennes (moyen, classique)"
+    for _ in range(1):
+        print("\n")
+        print("New iteration")
+        test_from_func_variational(pres, 25, 10, 2, True, Gaussian)
+        print("\n")
+
+    # small adn strings
+    pres = "Test pour des séquences ADN courtes (difficile, classique)"
+    test_from_func_variational(pres, 10, 15, 14, True, Sequence)
+
+    pres = "Test pour des données générées par ordinateur quantique (facile, quantique)"
+    print(pres)
+    _, samp_train, samp_test, labels = ad_hoc_data(15, 10, 2, 0.3, True)
+    sample_m, sample_p = stock_get(20, 0.3)
+
+    labels_me = [-1, 1]
+    samp_train_me = {-1: np.array(sample_m[:15]), 1: np.array(sample_p[:15])}
+    samp_test_me = {-1: np.array(sample_m[15:]), 1: np.array(sample_p[15:])}
+    print(samp_train)
+    print(samp_train_me)
+    print(samp_test)
+    print(samp_test_me)
+
+    print("Success for my implementation (second order):")
+    my_impl_variational(samp_train, samp_test, labels)
+    my_impl_variational(samp_train_me, samp_test_me, labels_me)
+
+
 def general_gantest(proba, nbr_qubits):
     for m in [4096, 2048]:
         for l in [1, 2, 3]:
             print("Easy mode results for m={} and l={}:".format(m, l))
             Variationer_learn_gan(1000, l, m, proba=proba, n=nbr_qubits, distri_size=0, easy=True)
             print("\n")
-            # print("Distribution learning results for m={} and l={}:".format(m, l))
-            # for d in [256, 512]:
-            #     print("For ", d, ": ")
-            #     Variationer_learn_gan(1000, l, m, proba=proba, n=nbr_qubits, distri_size=d, easy=False)
-            # print("Singleton learning results for m={} and l={}:".format(m, l))
-            # Variationer_learn_gan(1000, l, m, proba=proba, n=nbr_qubits, distri_size=0, easy=False)
+            print("Distribution learning results for m={} and l={}:".format(m, l))
+            for d in [256, 512]:
+                print("For ", d, ": ")
+                Variationer_learn_gan(1000, l, m, proba=proba, n=nbr_qubits, distri_size=d, easy=False)
+            print("Singleton learning results for m={} and l={}:".format(m, l))
+            Variationer_learn_gan(1000, l, m, proba=proba, n=nbr_qubits, distri_size=0, easy=False)
 
 
 def test_gan_qiskit(n, Database):
@@ -702,22 +797,23 @@ def test_gan_qiskit(n, Database):
 
     plt.show()
 
+
 def test_gan():
     # Variationer_learn_gan(1000, 1, 4096, proba=[1 / 24] * 24 + 8 * [0], n=5, distri_size=0, easy=True)
-    nbr_qubits = 4
+    nbr_qubits = 5
     # N = 5*10 ** 3
     #
     # Database = np.random.normal(0, 1, N)
     # test_gan_qiskit(nbr_qubits, Database)
     # beta
-    arr_beta = nbinom_proba(nbr_qubits, 40)
+    arr_beta = beta_proba(nbr_qubits, 2, 5)
 
-    # general_gantest(arr_beta, nbr_qubits)
+    general_gantest(arr_beta, nbr_qubits)
     #
     # # uniform not on [0, 32]
-    # if nbr_qubits == 5:
-    #     arr_unif = [1 / 24] * 24 + 8 * [0]
-    #     general_gantest(arr_unif, nbr_qubits)
+    if nbr_qubits == 5:
+        arr_unif = [1 / 24] * 24 + 8 * [0]
+        general_gantest(arr_unif, nbr_qubits)
     #
     # Normal 0, 1
     # arr_norm = None
@@ -752,6 +848,7 @@ def test_imag(online=False):
     plt.show()
     # presentation_imag(online)
 
+
 def test_new():
     from qiskit import BasicAer
     from qiskit.aqua.algorithms import Grover
@@ -761,6 +858,7 @@ def test_new():
     algorithm = Grover(LogicalExpressionOracle(expr))
     backend = BasicAer.get_backend('qasm_simulator')
     result = algorithm.run(backend, seed=101110)
+
 
 def test_dag():
     qr = QuantumRegister(5, 'qr')
@@ -912,6 +1010,11 @@ def test_clause():
     print(SAT)
     sat_to_3sat(SAT, k*len(V))
 
+
+def test_vs_ionq():
+    """bernstein vazirani for 1024 different oracles"""
+
+
 # test_svm_quantique()
 # test_svm()
 # test_compar(1.9)
@@ -923,7 +1026,8 @@ def test_clause():
 # test_gan()
 # test_imag(True)
 # oracletest(2)
-# test_new()
-# test_fonction_p()
-# test_fonction()
-# test_clause()
+#test_new()
+#test_fonction_p()
+#test_fonction()
+#test_clause()
+test_variational()

@@ -60,14 +60,9 @@ def better_grover(n):
     circ_m = measure(circ, q, [i for i in range(n)])
     return circ_m
 
-
-# We try it here
+# Tests
 
 
 circ_m = grover(5)
 launch(2048, circ_m)
 # circ_m.draw(output='mpl', plot_barriers = False)
-
-# We try it here
-circ_m = better_grover(7)
-launch(2048, circ_m)

@@ -108,8 +108,8 @@ def generation_grid(n, delta):
 def stock(n, sep):
     res = generation(n, sep)
 
-    uni = open('uni_{}_{}.txt'.format(n, sep), 'w')
-    doc = open('res_{}_{}.txt'.format(n, sep), 'w')
+    uni = open('data/uni_{}_{}.txt'.format(n, sep), 'w')
+    doc = open('data/res_{}_{}.txt'.format(n, sep), 'w')
     for i in range(max(len(res[0]), len(res[1]))):
         if i < len(res[0]) and i < len(res[1]):
             doc.write("{} {}\n".format(res[0][i], res[1][i]))
@@ -127,8 +127,8 @@ def stock(n, sep):
 def stock_compl(n, sep):
     res = generation_grid(n, sep)
 
-    uni = open('uni_grid.txt', 'w')
-    doc = open('res_grid.txt', 'w')
+    uni = open('data/uni_grid.txt', 'w')
+    doc = open('data/res_grid.txt', 'w')
     for i in range(max(len(res[0]), len(res[1]))):
         if i < len(res[0]) and i < len(res[1]):
             doc.write("{} {}\n".format(res[0][i], res[1][i]))
@@ -144,7 +144,7 @@ def stock_compl(n, sep):
 
 
 def stock_get(n, sep):
-    doc = open('res_{}_{}.txt'.format(n, sep), 'r')
+    doc = open('data/{}_{}.txt'.format(n, sep), 'r')
     nbr = ''
     store= False
     res = []

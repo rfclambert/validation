@@ -857,6 +857,7 @@ def extract_bin(counts, bits_N):
 
 
 def launch_hardware(circ, shots):
+    """Subroutine for launching on hardware (obsolet because melbourne is not a thing anymore"""
     backend_hardware = IBMQ.get_backend('ibmq_16_melbourne')
     job_sim = execute(circ, backend_hardware, shots=shots, optimization_level=1)
     result_sim = job_sim.result()
@@ -865,7 +866,7 @@ def launch_hardware(circ, shots):
 
 
 def presentation_imag(online=False):
-    """The main code for the presentation for ENSIAMG"""
+    """The main code for the presentation for ENSIMAG"""
     circ_m = circuit_simon(20, 7, 13)
     print("Circuit depth before transpilation : ", circ_m.depth())
     if online:

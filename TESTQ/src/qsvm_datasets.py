@@ -295,6 +295,7 @@ def sample_ad_hoc_data(sample_Total, test_size, n):
 
 
 def general_transformation(data, target, class_labels, plot_name, training_size, test_size, n, PLOT_DATA):
+    """Will give the data when given everything"""
     sample, _, label, _ = train_test_split(data, target, train_size=0.99, test_size=0.01, random_state=r.randrange(20), shuffle=True)
 
     # Now we standarize for gaussian around 0 with unit variance

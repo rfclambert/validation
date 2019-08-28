@@ -15,6 +15,7 @@ from qiskit.visualization import plot_state_city
 from qiskit.ignis.mitigation.measurement import (complete_meas_cal, tensored_meas_cal,
                                                  CompleteMeasFitter, TensoredMeasFitter)
 
+
 def ccxtest(n):
     """Truth table for cnx"""
     b = bina(n)
@@ -89,13 +90,13 @@ def ccx_otest(n):
     return circ_m
 
 
-def addition(a,b):
+def addition(a, b):
     """mesure b = b+a, a reste a"""
     bina = [int(x) for x in bin(a)[2:]]
     binb = [int(x) for x in bin(b)[2:]]
-    while len(bina)>=len(binb):
+    while len(bina) >= len(binb):
         binb = [0]+binb
-    while len(bina)<len(binb)-1:
+    while len(bina) < len(binb)-1:
         bina = [0]+bina
     bina.reverse()
     binb.reverse()
@@ -110,7 +111,7 @@ def addition(a,b):
         if binb[i]:
             circ.x(q[na+i])
     add(circ, q, [q[i] for i in range(len(bina))], [q[i+na] for i in range(len(binb)-1)], q[n], q[na+len(binb)-1])
-    circ_m = measure(circ, q, [i for i in range(na,n)])
+    circ_m = measure(circ, q, [i for i in range(na, n)])
     return circ_m
 
 
@@ -118,9 +119,9 @@ def addition_o(a, b):
     """mesure b = b+a, a reste a"""
     bina = [int(x) for x in bin(a)[2:]]
     binb = [int(x) for x in bin(b)[2:]]
-    while len(bina)>=len(binb):
+    while len(bina) >= len(binb):
         binb = [0]+binb
-    while len(bina)<len(binb)-1:
+    while len(bina) < len(binb)-1:
         bina = [0]+bina
     bina.reverse()
     binb.reverse()
@@ -135,7 +136,7 @@ def addition_o(a, b):
         if binb[i]:
             circ.x(q[na+i])
     add_o(circ, q, [q[i] for i in range(len(bina))], [q[i+na] for i in range(len(binb)-1)], q[n], q[na+len(binb)-1])
-    circ_m = measure(circ, q, [i for i in range(na,n)])
+    circ_m = measure(circ, q, [i for i in range(na, n)])
     return circ_m
 
 
@@ -143,9 +144,9 @@ def soustraction(a,b):
     """a = a, b = b-a, mesure b-a"""
     bina = [int(x) for x in bin(a)[2:]]
     binb = [int(x) for x in bin(b)[2:]]
-    while len(bina)>=len(binb):
+    while len(bina) >= len(binb):
         binb = [0]+binb
-    while len(bina)<len(binb)-1:
+    while len(bina) < len(binb)-1:
         bina = [0]+bina
     bina.reverse()
     binb.reverse()
@@ -160,23 +161,23 @@ def soustraction(a,b):
         if binb[i]:
             circ.x(q[na+i])
     sub(circ, q, [q[i] for i in range(len(bina))], [q[i+na] for i in range(len(binb)-1)], q[n], q[na+len(binb)-1])
-    circ_m = measure(circ, q, [i for i in range(na,n)])
+    circ_m = measure(circ, q, [i for i in range(na, n)])
     return circ_m
 
 
-def addition_mod(a,b,nbr):
+def addition_mod(a, b, nbr):
     """mesure b = b+a, a reste a"""
     bina = [int(x) for x in bin(a)[2:]]
     binb = [int(x) for x in bin(b)[2:]]
     binn = [int(x) for x in bin(nbr)[2:]]
     #print(binn)
-    while len(bina)>=len(binb):
+    while len(bina) >= len(binb):
         binb = [0]+binb
-    while len(bina)<len(binb)-1:
+    while len(bina) < len(binb)-1:
         bina = [0]+bina
-    while len(binn)<len(bina):
+    while len(binn) < len(bina):
         binn = [0]+binn
-    while len(binn)>len(bina):
+    while len(binn) > len(bina):
         bina = [0]+bina
         binb = [0]+binb
     binn.reverse()
@@ -197,7 +198,7 @@ def addition_mod(a,b,nbr):
     for i in range(len(binn)):
         if binn[i]:
             circ.x(q[nab+i])
-    addmod(circ, q,# A, B, lost, last, N, lost2, binn):
+    addmod(circ, q,  # A, B, lost, last, N, lost2, binn):
            [q[i] for i in range(len(bina))],
            [q[i+na] for i in range(len(binb)-1)],
            q[n],
@@ -209,21 +210,21 @@ def addition_mod(a,b,nbr):
     return circ_m
 
 
-def mult_mod(a,b,nbr,control):
+def mult_mod(a, b, nbr, control):
     """mesure b = b*a, a reste a, if control else b = a"""
     bina = [int(x) for x in bin(a)[2:]]
     # binb = [int(x) for x in bin(b)[2:]]
     binn = [int(x) for x in bin(nbr)[2:]]
-    while len(binn)<len(bina):
+    while len(binn) < len(bina):
         binn = [0]+binn
     # print(bina, binn)
     binn.reverse()
     bina.reverse()
     n = len(bina)+len(binn)*3+1
     na = len(bina)
-    nan = len(bina)+len(binn)#debut de Y
-    nany = len(bina)+2*len(binn)+1#debut de "A" (ici c'est b)
-    q = QuantumRegister(n+2+1, 'q')#+lost+lost2+control
+    nan = len(bina)+len(binn)  # debut de Y
+    nany = len(bina)+2*len(binn)+1  # debut de "A" (ici c'est b)
+    q = QuantumRegister(n+2+1, 'q')  # +lost+lost2+control
     circ = QuantumCircuit(q)
     for i in range(na):
         if bina[i]:
@@ -233,7 +234,7 @@ def mult_mod(a,b,nbr,control):
             circ.x(q[na+i])
     if control:
         circ.x(q[n+2])
-    cmultmod(circ, q,#control, X, a, A, Y, n, N, binn, lost, lost2
+    cmultmod(circ, q,  # control, X, a, A, Y, n, N, binn, lost, lost2
            q[n+2],
            [q[i] for i in range(len(bina))],
            b,
@@ -260,10 +261,10 @@ def exp_mod(a, b, nbr):
     bina.reverse()
     n = len(bina)+len(binn)*4+1
     na = len(bina)
-    nan = len(bina)+len(binn)#debut de Y
-    nany = len(bina)+2*len(binn)+1#debut de "A" (ici c'est b)
-    nanya = len(bina)+3*len(binn)+1#debut de "APOW" (ce qui doit etre mesuré)
-    q = QuantumRegister(n+2, 'q')#+lost+lost2
+    nan = len(bina)+len(binn)  # debut de Y
+    nany = len(bina)+2*len(binn)+1  # debut de "A" (ici c'est b)
+    nanya = len(bina)+3*len(binn)+1  # debut de "APOW" (ce qui doit etre mesuré)
+    q = QuantumRegister(n+2, 'q')  # +lost+lost2
     circ = QuantumCircuit(q)
     for i in range(na):
         if bina[i]:
@@ -271,7 +272,7 @@ def exp_mod(a, b, nbr):
     for i in range(len(binn)):
         if binn[i]:
             circ.x(q[na+i])
-    expmod(circ, q,# X, a, A, APOW, Y, n, N, binn, lost, lost2)
+    expmod(circ, q,  # X, a, A, APOW, Y, n, N, binn, lost, lost2)
            [q[i] for i in range(len(bina))],
            b%nbr,
            [q[i+nany] for i in range(len(binn))],
@@ -291,7 +292,8 @@ def exp_mod(a, b, nbr):
 
 
 def test_QFTn(n):
-    q = QuantumRegister(n, 'q')#+lost+lost2
+    """A test for the QFT circuit"""
+    q = QuantumRegister(n, 'q')  # +lost+lost2
     circ = QuantumCircuit(q)
     circ.x(q[0])
     RegX = [q[i] for i in range(n)]
@@ -305,6 +307,7 @@ def test_QFTn(n):
 
 # Tests
 def tests_truth():
+    """To check if everything is correct"""
     circ_m = ccxtest(4)
     print(circ_m)
     circ_m = crootnxtest(4)
@@ -316,6 +319,7 @@ def tests_truth():
 
 
 def test_arith():
+    """Arithmetic checks"""
     n_max = 17
     a = r.randrange(2**(n_max//2))
     b = r.randrange(2**(n_max//2))
@@ -373,14 +377,17 @@ def test_arith():
 
 
 def test_draw():
+    """To check for issues in drawing circuits"""
     circ_m = test_QFTn(3)
     print(launch(1024, circ_m))
     fig = circ_m.draw(output='mpl', filename='C:/Users/RaphaelLambert/Pictures/test.png')
+    return fig
 
 
 def test_24():
+    """Test for controlled H"""
     n = 5
-    q = QuantumRegister(n, 'q')  # +lost+lost2
+    q = QuantumRegister(n, 'q')
     circ = QuantumCircuit(q)
     for i in range(4):
         circ.h(q[i])
@@ -391,6 +398,7 @@ def test_24():
 
 
 def test_stat():
+    """A statistical test"""
     nt = 35
     age = [18, 19, 21, 20, 23, 22, 19, 19, 19, 19, 27, 24, 23, 18, 17, 24, 29]
     # age.append(29)  # niklas
@@ -402,6 +410,7 @@ def test_stat():
 
 
 def test_compar(K):
+    """No idea why I did that"""
     K_int = int(np.ceil(K))
     n_k = len(bin(K_int))-1
     complement = np.binary_repr(-K_int, width=n_k)
@@ -423,6 +432,7 @@ def test_compar(K):
 
 
 def classical_kernel_estimation(in_train, in_test, labels):
+    """will give the score of a classical kernel, given train and test data, and the labels"""
     X_train = []
     Y_train = []
     X_test = []
@@ -440,6 +450,7 @@ def classical_kernel_estimation(in_train, in_test, labels):
 
 
 def my_impl(in_train, in_test, labels):
+    """The same kernel test, but with quantum kernel"""
     X_train = []
     Y_train = []
     X_test = []
@@ -455,6 +466,7 @@ def my_impl(in_train, in_test, labels):
 
 
 def my_impl_variational(in_train, in_test, labels):
+    """The subroutine for variationnal learning"""
     X_train = []
     X_test = []
     for lab in labels:
@@ -463,14 +475,14 @@ def my_impl_variational(in_train, in_test, labels):
         for datum in in_test[lab]:
             X_test.append([datum, lab])
     Variationer_learn(X_train, 500, 1, 0.01, X_test, labels)
-    #kernel_estimation(X_train, Y_train, X_test, Y_test)
 
 
 def custom_constr(x, qr, inverse, depth):
+    """A constructor for a circuit for the quantum kernel, using a different method than the paper"""
     qc = QuantumCircuit(qr)
     maxi, mini = max(x), min(x)
     n = x.shape[0]
-    qc_wv = Wavelets(n).construct_circuit(register=qr)
+    #qc_wv = Wavelets(n).construct_circuit(register=qr)
     for _ in range(depth):
         qc.h(qr)
         for i in range(n):
@@ -510,6 +522,7 @@ def concat_succ(L):
 
 
 def test_from_func(pres, nbr_by_label, nbr_by_label_test, nbr_comp, plot_graph, function, quantum_instance):
+    """A usefull subroutine to make tests efficients for kernel and varitationnal learning"""
     print(pres)
     _, samp_train, samp_test, labels = function(nbr_by_label, nbr_by_label_test, nbr_comp, plot_graph)
     #print(samp_train)
@@ -569,6 +582,7 @@ def test_from_func(pres, nbr_by_label, nbr_by_label_test, nbr_comp, plot_graph, 
 
 
 def test_from_func_variational(pres, nbr_by_label, nbr_by_label_test, nbr_comp, plot_graph, function):
+    """The same function but with variationnal models"""
     print(pres)
     _, samp_train, samp_test, labels = function(nbr_by_label, nbr_by_label_test, nbr_comp, plot_graph)
 
@@ -580,6 +594,7 @@ def test_from_func_variational(pres, nbr_by_label, nbr_by_label_test, nbr_comp, 
 
 
 def Sequence(nbr_by_label, nbr_by_label_test, nbr_comp, plot_graph):
+    """A generator for random DNA sequences and a mutated version."""
     normal, muta = genere_chains(nbr_comp, 4)
     n_tot = (nbr_by_label + nbr_by_label_test + 1)
     X_n = [mutation(normal, [0.1, 0.1]) for _ in range(n_tot)]
@@ -612,6 +627,7 @@ def Sequence(nbr_by_label, nbr_by_label_test, nbr_comp, plot_graph):
 
 
 def test_svm():
+    """The full SVM tests"""
     backend = BasicAer.get_backend('statevector_simulator')
     random_seed = r.randint(1, 10598)
 
@@ -625,7 +641,7 @@ def test_svm():
     pres = "Test pour le data set Breast Cancer (facile, classique)"
     test_from_func(pres, 15, 10, 3, True, Breast_cancer, quantum_instance)
 
-    # digits
+    # digits (it's long so be careful)
     #pres = "Test pour le data set Digits (difficile, classique)"
     #test_from_func(pres, 10, 10, 10, True, Digits, quantum_instance)
 
@@ -647,6 +663,7 @@ def test_svm():
 
 
 def test_svm_quantique():
+    """To test the SVM models on quantum computer generated data"""
     backend = BasicAer.get_backend('statevector_simulator')
     random_seed = 10598
 
@@ -665,6 +682,7 @@ def test_svm_quantique():
     print(samp_test_me)
     classical_kernel_estimation(samp_train, samp_test, labels)
     classical_kernel_estimation(samp_train_me, samp_test_me, labels_me)
+
     # Generate the feature map
     feature_map = FirstOrderExpansion(feature_dimension=2, depth=2)
 
@@ -695,6 +713,7 @@ def test_svm_quantique():
     print(result['testing_accuracy'])
     print(result_me['testing_accuracy'])
 
+    # Last implementation using the custom circuit generator
     print("Success for my implementation (second order):")
     my_impl(samp_train, samp_test, labels)
     my_impl(samp_train_me, samp_test_me, labels_me)
@@ -714,6 +733,7 @@ def test_svm_quantique():
 
 
 def test_variational():
+    """The full tests with variationnal learning. Not ready for multi-label"""
     # iris
     #pres = "Test pour le data set Iris (facile, classique)"
     #test_from_func_variational(pres, 15, 10, 3, True, Iris)
@@ -742,6 +762,7 @@ def test_variational():
     pres = "Test pour des séquences ADN courtes (difficile, classique)"
     test_from_func_variational(pres, 10, 15, 14, True, Sequence)
 
+    #Quantum data
     pres = "Test pour des données générées par ordinateur quantique (facile, quantique)"
     print(pres)
     _, samp_train, samp_test, labels = ad_hoc_data(15, 10, 2, 0.3, True)
@@ -755,12 +776,13 @@ def test_variational():
     print(samp_test)
     print(samp_test_me)
 
-    print("Success for my implementation (second order):")
     my_impl_variational(samp_train, samp_test, labels)
+    print("Pour autres données quantiques")
     my_impl_variational(samp_train_me, samp_test_me, labels_me)
 
 
 def general_gantest(proba, nbr_qubits):
+    """All tests for gan model"""
     for m in [4096, 2048]:
         for l in [1, 2, 3]:
             print("Easy mode results for m={} and l={}:".format(m, l))
@@ -775,6 +797,7 @@ def general_gantest(proba, nbr_qubits):
 
 
 def test_gan_qiskit(n, Database):
+    """Test for in qiskit gan"""
     mini = np.min(Database)
     maxi = np.max(Database)
     h = (maxi - mini) / (2 ** n)
@@ -799,37 +822,41 @@ def test_gan_qiskit(n, Database):
 
 
 def test_gan():
-    # Variationer_learn_gan(1000, 1, 4096, proba=[1 / 24] * 24 + 8 * [0], n=5, distri_size=0, easy=True)
+    """Launch the subroutines for GAN test"""
     nbr_qubits = 5
+
+    # Normal law
     # N = 5*10 ** 3
     #
     # Database = np.random.normal(0, 1, N)
     # test_gan_qiskit(nbr_qubits, Database)
+
     # beta
     arr_beta = beta_proba(nbr_qubits, 2, 5)
 
     general_gantest(arr_beta, nbr_qubits)
-    #
-    # # uniform not on [0, 32]
+
+    # uniform not on [0, 32]
     if nbr_qubits == 5:
         arr_unif = [1 / 24] * 24 + 8 * [0]
         general_gantest(arr_unif, nbr_qubits)
-    #
-    # Normal 0, 1
-    # arr_norm = None
-    # general_gantest(arr_norm, nbr_qubits)
 
 
 def test_imag(online=False):
+    """All the tests for the imag presentation. """
     from qiskit.providers.aer import noise
     from qiskit import Aer
+
+    # Calibration
     qr = QuantumRegister(2)
     qubit_list = [0, 1]
     meas_calibs, state_labels = complete_meas_cal(qubit_list=qubit_list, qr=qr, circlabel='mcal')
+
     # Execute the calibration circuits without noise
     backend = Aer.get_backend('qasm_simulator')
     job = execute(meas_calibs, backend=backend, shots=1000)
     cal_results = job.result()
+
     # The calibration matrix without noise is the identity matrix
     meas_fitter = CompleteMeasFitter(cal_results, state_labels, circlabel='mcal')
     print(meas_fitter.cal_matrix)
@@ -837,8 +864,10 @@ def test_imag(online=False):
     T2 = [1e3, 1e3]  # arbitrarily chosen T2 times
     time_measure = 10e3  # arbitrarily chosen measurement time
     noise_thermal = noise.NoiseModel()
+
     for j in range(2):
         noise_thermal.add_quantum_error(noise.errors.standard_errors.thermal_relaxation_error(T1[j], T2[j], time_measure), "measure", [j])
+
     backend = Aer.get_backend('qasm_simulator')
     job = execute(meas_calibs, backend=backend, shots=1000, noise_model=noise_thermal)
     cal_results = job.result()
@@ -846,10 +875,13 @@ def test_imag(online=False):
     print(meas_fitter.cal_matrix)
     meas_fitter.plot_calibration()
     plt.show()
-    # presentation_imag(online)
+
+    # ensimag presentation
+    presentation_imag(online)
 
 
 def test_new():
+    """Tests for the new oracles for Grover"""
     from qiskit import BasicAer
     from qiskit.aqua.algorithms import Grover
     from qiskit.aqua.components.oracles import LogicalExpressionOracle
@@ -858,9 +890,11 @@ def test_new():
     algorithm = Grover(LogicalExpressionOracle(expr))
     backend = BasicAer.get_backend('qasm_simulator')
     result = algorithm.run(backend, seed=101110)
+    print(result)
 
 
 def test_dag():
+    """Test for the DAG generation in transpilation"""
     qr = QuantumRegister(5, 'qr')
     cr = ClassicalRegister(5, 'cr')
     ghz = QuantumCircuit(qr, cr, name='ghz')
@@ -872,12 +906,13 @@ def test_dag():
     ghz.cx(qr[3], qr[4])
     ghz.draw()
 
-    #ghz_dag = circuit_to_dag(ghz)
+    # ghz_dag = circuit_to_dag(ghz)
 
-    #print(ghz.width(), ghz_dag.width())
+    # print(ghz.width(), ghz_dag.width())
 
 
 def ab_finder(Func, Ind):
+    """Find some values in a function. Is used for the SAT study"""
     b = []
     for i in range(len(Func)):
         for j in range(i+1, len(Func)):
@@ -890,6 +925,7 @@ def ab_finder(Func, Ind):
 
 
 def norm1(f, g):
+    """|f-g|_1"""
     res = 0
     for i in range(len(f)):
         res += np.abs(f[i]-g[i])
@@ -897,6 +933,7 @@ def norm1(f, g):
 
 
 def test_fonction():
+    """Results of computation for SAT study"""
     Func = [[7729.018255678793, 140.153834155207, 68.77595919655846, 31.62018118184545, 18.030431610812485, 11.480451328936848, 8.854799040173322, 5.891748736768329, 4.107058029460621, 3.525987646397012, 2.6501857762543453, 1.9939336429398156, 1.796115967192535, 1.3439730213174272, 1.0573728322694307, 0.9370165183504918, 0.6862225806758537, 0.58629480789044, 0.46467717773394074, 0.4351295050299971, 0.31030829231196316, 0.18283441858118177, 0.2508750473787763, 0.12603102215466033, 0.1403733845624147, 0.208944572364959, 0.05937056209629393, 0.06406561737973851, 0.02549828229037716, 0.044190126138167286, 0.12220850634047802, 0.07250107250107221, 0.008166145780824684, 1.0000000000000118, 0.0016025641025641038, 0.00644122383252819, 0.0016025641025641038], [0.9610949812702193, 0.4109019899274278, 0.3089377623397382, 0.23495840772645324, 0.20677330100735603, 0.19949331148184576, 0.19889217797273162, 0.1983236356606282, 0.20419249563878353, 0.22439671222315674, 0.2468001421725052, 0.26934377202851223, 0.3026764978536294, 0.318102154625913, 0.36021755759452945, 0.3948630408193794, 0.4151320064818989, 0.4874842761804363, 0.5224160769563155, 0.5581950422944579, 0.5694688385000937, 0.55031751183993, 0.6849362225850419, 0.6075803939330335, 0.7350416126522452, 0.8427100469155232, 0.6733603675051251, 0.7902933382920369, 0.6836315434546335, 0.8276834938319588, 0.9487611479434883, 0.9330768568229448, 0.8193885540523317, 0.997, 0.6670224119530418, 0.8010253123998721, 0.6670224119530418]]
     Func2 = [[351.7858724605074, 86.17819599440456, 40.60817807215555, 22.41370879569776, 13.71370737429577, 9.380805367958237, 6.500771030437166, 5.1934818237317595, 3.8672723604183825, 2.9429262287072286, 2.2293044011542276, 1.7413726101499962, 1.4110020679698105, 1.145285045596285, 0.8493079536648233, 0.7075504964039413, 0.5314726701362551, 0.3946934984396482, 0.35765493303260854, 0.26720947446336063, 0.20483675723548622, 0.16768018253752273, 0.1348248093028533, 0.09131928959311625, 0.06352807714123655, 0.10443083847008712, 0.08486764614717036, 0.07948616458565717, 0.034928848641655796, 0.01957585644371944, 0.0101010101010101, 0.0060868252930227846, 0.003034178389628626, 1.0000000000000095, 0.00040016006402561054, 0.999999999998485, 1.0000000000005178], [0.4014557102478067, 0.19662718856027814, 0.14714271380376454, 0.12376760998544561, 0.11465015678691455, 0.11701257764627322, 0.11971607647950641, 0.12500413021169918, 0.13585072294949355, 0.15396764607614966, 0.1688776087223454, 0.19466317245480091, 0.22196728054180964, 0.25356761298043673, 0.2838683431502283, 0.32214826256665563, 0.3474420903976237, 0.38101744922057085, 0.4472615852893438, 0.4838915064306636, 0.5092442536661715, 0.5393723754562065, 0.6281883708635211, 0.6075021365541242, 0.5864414731409806, 0.8093479024729197, 0.8515064760519562, 0.8942467588311623, 0.7951232441028355, 0.8030838419531001, 0.8347245409015025, 0.7345183562814673, 0.5796857049505159, 0.9992, 0.500100020004001, 0.9997999999999997, 0.9996000000000002]]
     Func3 = [[0, 587.8353916144741, 122.51606563339197, 43.412900839437754, 23.57555460166956, 15.269810446375592,
@@ -924,7 +961,7 @@ def test_fonction():
     index5 = np.linspace(0.2, 7.8, 27)
     index6 = [0.15, 0.25, 0.3, 0.4, 0.45]+[0.5+i*0.2 for i in range(28)]
 
-    n=100
+    n = 100
     b = np.log(Func2[0][4]/Func2[0][5])/np.log(2/1.7)
     a = Func2[0][4]*(1.7**b)
     print(a, b)
@@ -945,11 +982,12 @@ def test_fonction():
     plt.plot(index6, Func6[0], color='orange')
     index_comp = np.linspace(0.1+1/n, 11, n)
     #plt.plot(index_comp, a/((index_comp)**b), color='blue')
-    plt.plot(index_comp, a_t6/((index_comp)**b_t6), color='green')
-
+    plt.plot(index_comp, a_t6/(index_comp**b_t6), color='green')
     plt.show()
 
+
 def test_fonction_p():
+    """Other computation for SAT study"""
     Func = [[7729.018255678793, 140.153834155207, 68.77595919655846, 31.62018118184545, 18.030431610812485,
              11.480451328936848, 8.854799040173322, 5.891748736768329, 4.107058029460621, 3.525987646397012,
              2.6501857762543453, 1.9939336429398156, 1.796115967192535, 1.3439730213174272, 1.0573728322694307,
@@ -1003,6 +1041,7 @@ def test_fonction_p():
 
 
 def test_clause():
+    """Will give a 3SAT problem"""
     V = [i for i in range(4)]
     E = [(0, i) for i in range(1, 4)]
     k = 3
@@ -1011,9 +1050,7 @@ def test_clause():
     sat_to_3sat(SAT, k*len(V))
 
 
-def test_vs_ionq():
-    """bernstein vazirani for 1024 different oracles"""
-
+# All tests can be launched here
 
 # test_svm_quantique()
 # test_svm()

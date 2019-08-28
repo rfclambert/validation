@@ -67,5 +67,6 @@ def main():
     #print("testing success ratio: ", result['testing_accuracy'])
     from scipy.ndimage import convolve
 
+
 if __name__ == '__main__':
     main()

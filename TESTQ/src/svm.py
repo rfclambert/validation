@@ -13,6 +13,7 @@ from sklearn.decomposition import PCA
 
 IBMQ.load_accounts()
 
+
 def generation(n, delta):
     """We want to generate data hard to learn for a classical machine learning algo.
     We generate couples and then apply a map on it"""
@@ -106,6 +107,7 @@ def generation_grid(n, delta):
 
 
 def stock(n, sep):
+    """to store the quantum dataset"""
     res = generation(n, sep)
 
     uni = open('data/uni_{}_{}.txt'.format(n, sep), 'w')
@@ -125,6 +127,7 @@ def stock(n, sep):
 
 
 def stock_compl(n, sep):
+    """To store an entire grid of quantum generated data"""
     res = generation_grid(n, sep)
 
     uni = open('data/uni_grid.txt', 'w')
@@ -144,6 +147,7 @@ def stock_compl(n, sep):
 
 
 def stock_get(n, sep):
+    """To retrieve data from an already generated dataset"""
     doc = open('data/{}_{}.txt'.format(n, sep), 'r')
     nbr = ''
     store= False
@@ -367,6 +371,7 @@ def classical_kernel_estimation(X, Y, T, Ty):
 
 
 def test_iris():
+    """test for the iris dataset. better use the tests.py file"""
     iris = datasets.load_iris()
     dejavu = []
     X = []
@@ -379,13 +384,13 @@ def test_iris():
         while ind in dejavu:
             ind = r.randrange(n)
         X.append(iris.data[ind, :4])
-        Y.append(-1*(iris.target[ind]==0)+1*(iris.target[ind]!=0))
+        Y.append(-1*(iris.target[ind] == 0)+1*(iris.target[ind] != 0))
         dejavu.append(ind)
         ind = r.randrange(n)
         while ind in dejavu:
             ind = r.randrange(n)
         T.append(iris.data[ind, :4])
-        Ty.append(-1*(iris.target[ind]==0)+1*(iris.target[ind]!=0))
+        Ty.append(-1*(iris.target[ind] == 0)+1*(iris.target[ind] != 0))
         dejavu.append(ind)
         #print(dejavu)
     print(X, Y, T, Ty)
@@ -406,6 +411,7 @@ def test_iris():
 
 
 def test_string(n, nbr_qbits, choice, method):
+    """test for strings. better use the tests.py file"""
     n_test = 20
     if choice == 'mat':
         X, Y, _ = get_data(0)

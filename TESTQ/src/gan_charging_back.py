@@ -181,7 +181,7 @@ def Variationer_learn_gan(shots, l, m, proba=None, n=4, distri_size=0, easy=Fals
             value = int('0b' + KEY, 2)
             bins_var[value] = counts[KEY] / m
 
-        # L1 distance calculation
+        # L1 distance/cross-entropy calculation
         compar = [len(b) / N for b in bins]
         err_theta = cross_entropy(bins_var, compar)
 
@@ -240,6 +240,7 @@ def Variational_prepared(theta, n):
     q = QuantumRegister(n, 'q')
     circ_test = QuantumCircuit(q)
     RegX = [q[i] for i in range(n)]
+    # We use the given theta. It's a way to test models after they have been stored
     W(circ_test, q, RegX, theta)
     circ_m = measure_direct(circ_test, q, RegX)
     prec_here = 4096
@@ -276,7 +277,8 @@ def mosel():
 
 
 def constants():
-    """Just some good models"""
+    """The theta of some good models. To test them, use Variational_prepared(theta, n)
+    for the theta of your choice."""
     t_1_32 = [3.31864808,  2.70163485,  0.17376359, -2.09200851, -5.64278358,
               -0.02805571, -1.69355561, -1.80010967, -0.90994795,  1.04365892,
               -1.66310046,  4.20790657, -1.59076603,  1.0952253, -1.65380373,

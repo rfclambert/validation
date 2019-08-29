@@ -1050,6 +1050,17 @@ def test_clause():
     sat_to_3sat(SAT, k*len(V))
 
 
+def test_calendrier(day, month):
+    months = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+    initial = day
+    mo = 1
+    while mo < month:
+        initial += months[mo-1]
+        mo += 1
+    while initial < 809:
+        print(initial)
+        initial += 366
+
 # All tests can be launched here
 
 # test_svm_quantique()
@@ -1067,4 +1078,4 @@ def test_clause():
 #test_fonction_p()
 #test_fonction()
 #test_clause()
-test_variational()
+# test_variational()
